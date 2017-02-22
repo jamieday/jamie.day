@@ -9,7 +9,7 @@ body {
 
 .main_input {
 	text-align: center;
-	background: green;#1976D2;	
+	background-color: #c62828;
 	color: white;
     font-size: 36px;
 	border: none;
@@ -22,9 +22,19 @@ body {
     height: 50%;
 }
 
-.main_input.green {
+.main_input.valid {
+	background-color: green;
 }
 
 .main_input:focus {
 	outline: none;
+}
+
+.signupsert-title {
+    position: absolute;
+    top: 80%;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 5px;
+    font-size: 15px;
 }

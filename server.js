@@ -33,6 +33,11 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.get('/home', function(req, res){
+	// does not cache
+	res.sendFile(path.join(__dirname, '/public/home.html'));
+});
+
 app.listen(app.get('port'), function() {
   console.log('Server started: http://localhost:' + app.get('port') + '/');
 });

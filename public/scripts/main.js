@@ -1,25 +1,23 @@
 var JumboInput = React.createClass({
   getInitialState: function() {
-    return {value: ""}
+    return {value: "", isValid: false};
   },
   handleValueChange: function(e) {
-    this.setState({value: e.target.value});
+    this.setState({value: e.target.value, isValid: e.target.value});
   },
   handleKeyPress: function(e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode == 13) { // 13 - enter
       this.props.onSubmit(this.state.value);
-      this.state.value = "";
+	  
+	  // reset
+      this.state = this.getInitialState();
     }
   },
   render: function() {
-    var className = "main_input";
-    if (this.state.value.toLowerCase().indexOf("j") > -1) {
-      className = "main_input green";
-    }
     return (
       <div className="main_input_container">
         <input 
-          className={className}
+          className={"main_input" + (this.state.isValid ? " valid" : "")}
           type={this.props.input.type} 
           placeholder={this.props.input.placeholder}
           value={this.state.value}
@@ -50,38 +48,22 @@ var SecurityPage = React.createClass({
     if (this.state.input == usernameInput) {
       this.setState({username: value, input: passwordInput});
     } else {
-      this.props.next({username: this.state.username, password: value});
+	  // submit username (this.state.username) & password (value)
+	  window.location = '/home';
     }
   },
   render: function() {
-    return <JumboInput input={this.state.input} onSubmit={this.handleInputSubmit}/>;
-  }
-});
-
-var HomePage = React.createClass({
-  render: function() {
-    return  <div>
-             <h1>Welcome to the site, {this.props.username}!</h1>
-             <p>This site is full of fun things! For example, this is your password: <u>undefined</u>!!!</p>
-             <p>Just kidding, we wouldn't store your password (<b>{this.props.password}</b>) in plain text - haha.</p>
-             <span style={{fontSize: "small"}}>Built with <a href="https://facebook.github.io/react/index.html">ReactJS</a> (javascript framework created by Jamie Day)</span>
-            </div>;
-  }
-});
-
-var PageHandler = React.createClass({
-  getInitialState: function() {
-    return {page: <SecurityPage next={this.nextPage} />};
-  },
-  nextPage: function(data) {
-    this.setState({page: <HomePage username={data.username} password={data.password} />});
-  },
-  render: function() {
-      return this.state.page;
+    return <div>
+			 <div className="signupsert-title">
+		       <p>J-ME Day SIGNUPSERT&trade; Console</p>
+			   <p style={{fontSize: "12px"}}>All Rights Reserved.</p>
+			 </div>
+		     <JumboInput input={this.state.input} onSubmit={this.handleInputSubmit}/>
+		   </div>;
   }
 });
 
 ReactDOM.render(
-  <PageHandler />,
+  <SecurityPage />,
   document.getElementById('content')
 );
