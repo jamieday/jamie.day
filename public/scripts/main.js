@@ -49,7 +49,7 @@ var SecurityPage = React.createClass({
       this.setState({username: value, input: passwordInput});
     } else {
 	  // submit username (this.state.username) & password (value)
-	  window.location = '/home';
+	  window.location = '/welcome';
     }
   },
   render: function() {

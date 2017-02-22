@@ -33,9 +33,9 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/home', function(req, res){
+app.get('/welcome', function(req, res) {
 	// does not cache
-	res.sendFile(path.join(__dirname, '/public/home.html'));
+	res.sendFile(path.join(__dirname, '/public/welcome.html'));
 });
 
 app.listen(app.get('port'), function() {
