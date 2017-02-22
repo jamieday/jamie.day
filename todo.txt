@@ -1,1 +1,3 @@
-Github this shit
+github private
+ajax login checks with little loading symbol
+welcome fade in thing
