@@ -8,7 +8,7 @@ var JumboInput = React.createClass({
   handleKeyPress: function(e) {
     if (e.keyCode == 13) { // 13 - enter
       this.props.onSubmit(this.state.value);
-	  
+
 	  // reset
       this.state = this.getInitialState();
     }
@@ -16,13 +16,13 @@ var JumboInput = React.createClass({
   render: function() {
     return (
       <div className="main_input_container">
-        <input 
+        <input
           className={"main_input" + (this.state.isValid ? " valid" : "")}
-          type={this.props.input.type} 
+          type={this.props.input.type}
           placeholder={this.props.input.placeholder}
           value={this.state.value}
           onChange={this.handleValueChange}
-          onKeyDown={this.handleKeyPress} 
+          onKeyDown={this.handleKeyPress}
           autoFocus />
       </div>
     );
@@ -48,14 +48,14 @@ var SecurityPage = React.createClass({
     if (this.state.input == usernameInput) {
       this.setState({username: value, input: passwordInput});
     } else {
-	  // submit username (this.state.username) & password (value)
-	  window.location = '/welcome';
+	      // submit username (this.state.username) & password (value)
+	      window.location = '/welcome';
     }
   },
   render: function() {
     return <div>
-			 <div className="signupsert-title">
-		       <p>J-ME Day SIGNUPSERT&trade; Console</p>
+			 <div className="signinsert-title">
+		       <p>J-ME Day SIGNINSERT&trade; Console</p>
 			   <p style={{fontSize: "12px"}}>All Rights Reserved.</p>
 			 </div>
 		     <JumboInput input={this.state.input} onSubmit={this.handleInputSubmit}/>
