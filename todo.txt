@@ -1,3 +1,4 @@
 github private
 ajax login checks with little loading symbol
-welcome fade in thing
+make a debug console as a component on the page
+look into the already stuff on server.js
