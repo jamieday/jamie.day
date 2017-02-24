@@ -21,16 +21,25 @@ var Page = React.createClass({
   beginPageLogic: function() {
     // Basically the following is the entire page data
     this.setState({ style: {textAlign: "center", position: "absolute", top: "40%", width: "100%"} });
-    let welcomeText = document.createElement("h3");
-    welcomeText.innerHTML = "Welcome.";
-    welcomeText.style.visibility = "hidden";
-    welcomeText.style.opacity = 0;
-    this.content.appendChild(welcomeText);
 
-    this.scheduleTask((duration) => {this.fadeIn(welcomeText, duration)}, 2000);
-    this.scheduleWait(1000); // wait one second, then fade out
-    this.scheduleTask((duration) => {this.fadeOut(welcomeText, duration)}, 2000);
-    this.scheduleTask(() => {this.content.removeChild(welcomeText)});
+    this.scheduleFadeInOutText("Welcome.");
+    this.scheduleFadeInOutText("Not much to see here, site still under construction.");
+    this.scheduleFadeInOutText("Have a nice day =)");
+  },
+  scheduleFadeInOutText: function(text, options = {fadeInDuration: 2000, fadeOutDuration: 2000, stallDuration: 1000}) {
+    let fadeInOutText = document.createElement("h3");
+    this.scheduleTask(() => {
+      fadeInOutText.innerHTML = text;
+      fadeInOutText.style.visibility = "hidden";
+      fadeInOutText.style.opacity = 0;
+      this.content.appendChild(fadeInOutText);
+      // todo bug this is not correctly initializing the new elements with hidden and opac 0
+      // something todo with STyles or refs who knows
+    });
+    this.scheduleTask((duration) => {this.fadeIn(fadeInOutText, duration)}, options.fadeInDuration);
+    this.scheduleWait(options.stallDuration); // wait, then fade out
+    this.scheduleTask((duration) => {this.fadeOut(fadeInOutText, duration)}, options.fadeOutDuration);
+    this.scheduleTask(() => {this.content.removeChild(fadeInOutText)});
   },
   getMsTillCurrentTask: function() {
     if (this.debugScheduler && !this.atBreakPoint) return 0;
