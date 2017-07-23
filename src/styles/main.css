@@ -43,13 +43,18 @@ h1 {
   overflow: hidden; /* Ensures the content is not revealed until the animation */
   letter-spacing: .15em; /* Adjust as needed */
 }
-.home-action-container {
+.action-container {
   display: inline-block;
   padding: 15px;
   margin-top: 40px;
   margin-left: auto;
   margin-right: auto;
-  background-color: #999;
+  background-color: #424242;
+}
+#jm-console {
+  background-color: transparent;
+  border: none;
+  outline: none;
 }
 .fade-in {
   opacity: 0;
