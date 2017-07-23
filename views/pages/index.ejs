@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+</head>
+
+<body>
+
+  <% include ../partials/nav.ejs %>
+
+<div class="jm-background-img"></div>
+<div class="content text-center">
+  <a href="/" class="icon-circular">
+    <img src="/images/icon.png">
+  </a>
+  <h1 style="margin-bottom: 0"><span class="type-in">Jamie Day</span></h1>
+  <h3 style="margin-top: 0"><span class="fade-in">Personal Website</span></h3>
+
+   <div class="home-action-container fade-in">
+     <table>
+       <thead>
+         <th><%= phrase.websiteWord %> is <%= phrase.currentlyWord %> <%= phrase.prepositionWord %> <%= phrase.constructionWord %>!</th>
+      </thead>
+      <tbody>
+        <td></td>
+      </tbody>
+     </table>
+   </div>
+</div>
+<script type="text/javascript" src="scripts/main.js"></script>
+</body>
+</html>

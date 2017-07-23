@@ -1,0 +1,94 @@
+body {
+  font-family: 'Open Sans', 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.navbar {
+  border: none;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+
+.jm-background-img {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 50px);
+  background-position: top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -1;
+}
+.jm-background-img::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: '';
+  background-color: #212121; /* material grey 900 */
+  animation: translucinate 2s ease 1s 1 forwards; /* todo variables for these #s */
+}
+h1 {
+    font-size: 64px;
+}
+.content {
+  color :white;
+  width: 100vw;
+  height: 100%;
+  border-radius: 3px;
+  padding: 20px 0 0 0;
+  margin: auto;
+
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  letter-spacing: .15em; /* Adjust as needed */
+}
+.home-action-container {
+  display: inline-block;
+  padding: 15px;
+  margin-top: 40px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #999;
+}
+.fade-in {
+  opacity: 0;
+  animation: fwade-in 1s ease 1s 1 forwards;
+}
+.type-in {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 4s;
+}
+/* The typing effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+@keyframes fwade-in {
+    from {
+      opacity: 0;
+      filter: blur(5px);
+    }
+    to {
+      opacity: 1;
+      filter: none;
+    }
+}
+@keyframes translucinate {
+    to { background-color: rgba(33, 33, 33, 0.75) }
+}
+.icon-circular {
+  display: block;
+  background: #ccc;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  border: 2px solid white;
+}
+.icon-circular img {
+  max-width: 100%;
+}

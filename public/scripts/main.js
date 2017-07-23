@@ -1,69 +1,16 @@
-var JumboInput = React.createClass({
-  getInitialState: function() {
-    return {value: "", isValid: false};
-  },
-  handleValueChange: function(e) {
-    this.setState({value: e.target.value, isValid: e.target.value});
-  },
-  handleKeyPress: function(e) {
-    if (e.keyCode == 13) { // 13 - enter
-      this.props.onSubmit(this.state.value);
-
-	  // reset
-      this.state = this.getInitialState();
-    }
-  },
-  render: function() {
-    return (
-      <div className="main_input_container">
-        <input
-          className={"main_input" + (this.state.isValid ? " valid" : "")}
-          type={this.props.input.type}
-          placeholder={this.props.input.placeholder}
-          value={this.state.value}
-          onChange={this.handleValueChange}
-          onKeyDown={this.handleKeyPress}
-          autoFocus />
-      </div>
-    );
-  }
-});
-
-
-
-var usernameInput = {
-  "type": "text",
-  "placeholder": "Enter your username."
+const backgroundImages = [
+  "http://wallpapercave.com/wp/zm8bgId.jpg",
+  "https://s-media-cache-ak0.pinimg.com/originals/31/80/d2/3180d2c319d8400c096696b687f9a5b5.jpg",
+  "/images/sexy-image.jpg",
+  "https://image.freepik.com/free-psd/abstract-background-design_1297-84.jpg",
+];
+window.onload = () => {
+  let bgElement = document.getElementsByClassName("jm-background-img")[0];
+  let bgIndex = 0;
+  bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++]}')`;
+  bgElement.style.transition = 'background-image 1s';
+  let changeBg = () => {
+    bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++ % backgroundImages.length]}')`;
+  };
+  setInterval(changeBg, 10000);
 };
-var passwordInput = {
-  "type": "password",
-  "placeholder": "Enter your password."
-};
-
-var SecurityPage = React.createClass({
-  getInitialState: function() {
-    return {username: null, password: null, input: usernameInput };
-  },
-  handleInputSubmit: function(value) {
-    if (this.state.input == usernameInput) {
-      this.setState({username: value, input: passwordInput});
-    } else {
-	      // submit username (this.state.username) & password (value)
-	      window.location = '/welcome';
-    }
-  },
-  render: function() {
-    return <div>
-			 <div className="signinsert-title">
-		       <p>J-ME Day SIGNINSERT&trade; Console</p>
-			   <p style={{fontSize: "12px"}}>All Rights Reserved.</p>
-			 </div>
-		     <JumboInput input={this.state.input} onSubmit={this.handleInputSubmit}/>
-		   </div>;
-  }
-});
-
-ReactDOM.render(
-  <SecurityPage />,
-  document.getElementById('content')
-);
