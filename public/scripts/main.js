@@ -11,7 +11,14 @@ let preloadImages = imageUrls => {
   }
 };
 window.onload = () => {
-  let util = {};
+  let util = {
+    escapeHtml: html => {
+      let text = document.createTextNode(html);
+      let div = document.createElement("div");
+      div.appendChild(text);
+      return div.innerHTML;
+    }
+  };
   handleBgImages(util);
   handleJmConsole(util);
 };
@@ -28,7 +35,7 @@ let handleBgImages = util => {
 };
 
 let handleJmConsole = util => {
-  let consoleElement = document.getElementById("jm-console");
+  let consoleElement = document.getElementById("jm-console-input");
   let consoleInstructionsElement = document.getElementById("jm-console-instructions");
   let setInstructions = instruction => { consoleInstructionsElement.innerHTML = instruction; };
   util.clearConsole = () => {
@@ -42,7 +49,14 @@ let handleJmConsole = util => {
         run: () => {
           let helpAvailableCmds = "";
           for (key in commands) {
-            helpAvailableCmds += `${key} - ${commands[key].description}<br>`;
+            let command = commands[key];
+            let aliasesStr = '';
+            if (command.aliases) {
+              const separator = " / ";
+              aliasesStr = separator;
+              aliasesStr += command.aliases.join(separator);
+            }
+            helpAvailableCmds += `${key}${aliasesStr} - ${commands[key].description}<br>`;
           }
           helpAvailableCmds += "<br>More commands available soon™.";
           setInstructions(helpAvailableCmds);
@@ -60,10 +74,18 @@ let handleJmConsole = util => {
         run: () => {
           window.open('https://www.linkedin.com/in/dayjamie/', '_blank');
         }
+      },
+      "exit": {
+        description: "\"get me outta here\"",
+        run: () => {
+          util.consoleLogout();
+        },
+        aliases: ["logout"]
       }
     };
     for (key in commands) {
-      if (cmd == key) {
+      let command = commands[key];
+      if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
         commands[key].run();
         return;
       } else if (cmd.toLowerCase() == key.toLowerCase()) {
@@ -78,7 +100,14 @@ let handleJmConsole = util => {
 
   // Handle commands
   const INIT = 0, LOGGED_IN = 1;;
-  let state = INIT
+  let state = INIT;
+  const welcomeMsg = "Type \"jamie is the best\" to begin!";
+  let resetConsole = () => {
+    state = INIT;
+    setInstructions(welcomeMsg);
+  }
+  resetConsole();
+  util.consoleLogout = resetConsole;
   let swagTimeout, hacked;
   let computingCmd = false;
   let processCmd = async cmd => {
@@ -90,7 +119,7 @@ let handleJmConsole = util => {
           if (swagTimeout) clearTimeout(swagTimeout);
           setInstructions("Validating password...");
           consoleElement.disabled = true;
-          await (new Promise((resolve) => setTimeout(resolve, 500+Math.random()*1000)));
+          await (new Promise((resolve) => setTimeout(resolve, 400+Math.random()*300)));
           setInstructions("Access unlocked.<br>"
            + " Try \"help\" to start off.");
            consoleElement.disabled = false;
@@ -116,8 +145,13 @@ let handleJmConsole = util => {
     e = e || window.event;
     let keyCode = e.keyCode || e.which;
     if (keyCode == 13) {
-      processCmd(consoleElement.value);
+      processCmd(util.escapeHtml(consoleElement.value));
       return false;
     }
+  };
+
+  // Focus console input is console is clicked
+  document.getElementById("jm-console").onclick = () => {
+    consoleElement.focus();
   };
 };
