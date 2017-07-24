@@ -54,6 +54,7 @@ h1 {
   background-color: rgba(33,33,33,1);
 }
 #jm-console-input {
+  width: calc(100% - 15px);
   background-color: transparent;
   border: none;
   outline: none;
