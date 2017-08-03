@@ -1,9 +1,13 @@
-let path = require('path');
-let express = require('express');
-let fs = require('fs');
-let app = express();
-let exec = require('child_process').exec;
-let config = require('./config');
+const path = require('path');
+const express = require('express');
+const fs = require('fs');
+const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const SocketHandler = require('./app-sockethandler');
+const exec = require('child_process').exec;
+const config = require('./config');
+const port = process.env.PORT || 5050
 
 if (!process.env.ENVIRONMENT) {
   console.error("ERR: No environment specified (e.g., DEV / STAGING / PRODUCTION)");
@@ -11,22 +15,13 @@ if (!process.env.ENVIRONMENT) {
 }
 
 let isDev = process.env.ENVIRONMENT === 'DEV';
-
-app.set('port', (process.env.PORT || 5050));
+let skipPipeline = false;
 
 app.use(express.static(path.join(__dirname, 'public')));
 if (isDev) {
-  // Note: this is a major hack
-  app.use(express.static(path.join(__dirname, 'src')));
-  setTimeout(runApp, 0);
-} else {
-  // Run css pipeline
-  exec("mkdir -p public/styles && node_modules/.bin/postcss src/styles/main.css --use autoprefixer | node_modules/.bin/cssmin >public/styles/main.css",
-    (err, stdout, stderr) => {
-      if (stdout) console.log(stdout);
-      if (stderr) console.error(stderr);
-      runApp();
-    });
+  // use styles from source in dev instead of preprocessed
+  app.use('/styles', express.static(path.join(__dirname, 'src', 'styles')));
+  skipPipeline = true;
 }
 
 // views is directory for all template files
@@ -68,9 +63,39 @@ app.get('/', function(req, res) {
   res.render('pages/index', { phrase: phrase });
 });
 
-function runApp() {
-  let port = app.get('port');
-  app.listen(port, function() {
-    console.log(`[${process.env.ENVIRONMENT}] Kicking it on port ${port}`);
+async function executeCommand(cmd) {
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error, stdout, stderr) => {
+        if (error) reject(error);
+        resolve({stdout: stdout, stderr: stderr});
+      });
   });
 }
+
+async function executeCssPipeline() {
+  try {
+    let output = await executeCommand("mkdir -p public/styles && node_modules/.bin/postcss src/styles/main.css --use autoprefixer | node_modules/.bin/cssmin >public/styles/main.css");
+    if (output.stdout) console.log(output.stdout);
+    if (output.stderr) console.error(output.stderr);
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
+};
+
+async function listen(port) {
+  return new Promise(resolve => {
+    // listen for socket connections
+    io.on('connection', SocketHandler.onConnection);
+    // begin listening http
+    server.listen(port, resolve);
+  });
+}
+
+async function runApp() {
+  if (!skipPipeline) await executeCssPipeline();
+  await listen(port);
+  console.log(`[${process.env.ENVIRONMENT}] Kicking it on port ${port}`);
+}
+
+runApp();
