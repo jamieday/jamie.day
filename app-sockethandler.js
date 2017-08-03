@@ -1,8 +1,10 @@
-function onDraw(data) {
-  socket.broadcast.emit('drawing', data);
+function onDraw(socket) {
+  return data => {
+    socket.broadcast.emit('drawing', data);
+  }
 }
 module.exports = {
-  onConnection: (socket) => {
-    socket.on('drawing', onDraw);
+  onConnection: socket => {
+    socket.on('drawing', onDraw(socket));
   }
 };

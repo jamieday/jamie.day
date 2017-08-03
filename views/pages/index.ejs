@@ -16,11 +16,25 @@
   <h1 style="margin-bottom: 0"><span class="type-in">Jamie Day</span></h1>
   <h3 style="margin-top: 0"><span class="fade-in">Personal Website</span></h3>
 
-   <div id="jm-console" class="fade-in">
-     <p id="jm-console-instructions"></p>
-     <span style="float: left;width: 15px">$</span><input type="text" id="jm-console-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-   </div>
+  <div id="jm-console" class="fade-in">
+    <p id="jm-console-instructions"></p>
+    <span style="float: left;width: 15px">$</span><input type="text" id="jm-console-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  </div>
+
+  this thing here is a wip: (online persistent blackboard)
+  <div class="blackboard-container">
+    <canvas class="blackboard"></canvas>
+    <div class="colors">
+      <div class="color white"></div>
+      <div class="color red"></div>
+      <div class="color green"></div>
+      <div class="color blue"></div>
+      <div class="color yellow"></div>
+    </div>
+  </div>
 </div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/scripts/blackboard.js"></script>
 <script type="text/javascript" src="scripts/main.js"></script>
 </body>
 </html>

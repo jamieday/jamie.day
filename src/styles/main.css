@@ -100,3 +100,47 @@ h1 {
 .icon-circular img {
   max-width: 100%;
 }
+
+/**
+ * Blackboard
+ */
+
+.blackboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.blackboard {
+  cursor: crosshair;
+  user-select: none;
+  background-color: black;
+  border-radius: 15px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.colors {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 75%;
+  background-color: #424242;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.color {
+  display: inline-block;
+  height: 40px;
+  width: 40px;
+}
+
+.color.white { background-color: white; }
+.color.red { background-color: red; }
+.color.green { background-color: green; }
+.color.blue { background-color: blue; }
+.color.yellow { background-color: yellow; }
