@@ -4,7 +4,7 @@ const fs = require('fs');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const SocketHandler = require('./app-sockethandler');
+const socketHandler = require('./app-sockethandler').createHandler(io);
 const exec = require('child_process').exec;
 const config = require('./config');
 const port = process.env.PORT || 5050
@@ -86,7 +86,7 @@ async function executeCssPipeline() {
 async function listen(port) {
   return new Promise(resolve => {
     // listen for socket connections
-    io.on('connection', SocketHandler.onConnection);
+    socketHandler.registerListeners();
     // begin listening http
     server.listen(port, resolve);
   });

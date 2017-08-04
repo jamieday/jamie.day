@@ -5,21 +5,47 @@ const canvasBuffer = document.createElement('canvas');
 const ctxBuffer = canvasBuffer.getContext('2d');
 const colors = document.getElementsByClassName('color');
 
-let current = { color: 'white' };
+let clientData = {
+  totalOnline: 0,
+  selectedColor: 'white',
+  currentPos: {}
+ };
 
 window.addEventListener('resize', onResize);
 onResize();
 
 function refreshCurrentColorRect() {
-  ctx.fillStyle = current.color;
+  ctx.fillStyle = clientData.selectedColor;
   ctx.fillRect(20, 20, 40, 40);
+}
+function refreshTotalOnlineComponent() {
+  ctx.fillStyle = 'white';
+  ctx.font = '18px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  if (clientData.totalOnline && clientData.totalOnline > 1) {
+    ctx.fillText(`${clientData.totalOnline} online`, canvas.width - 20, 20);
+  }
 }
 function setCurrentColorByElement(el) {
   let color = el.className.split(' ')[1];
-  current.color = color;
+  clientData.selectedColor = color;
   refreshCurrentColorRect();
 }
-refreshCurrentColorRect();
+let totalOnline;
+function onLogin(data) {
+  clientData.totalOnline = data.totalOnline;
+  refreshComponents();
+}
+function onLogout(data) {
+  clientData.totalOnline = data.totalOnline;
+  refreshComponents();
+}
+function refreshComponents() {
+  clearAndRedrawLines();
+  refreshCurrentColorRect();
+  refreshTotalOnlineComponent();
+}
 
 let drawing = false;
 
@@ -32,7 +58,10 @@ for (let i = 0; i < colors.length; i++){
   colors[i].addEventListener('click', onColorUpdate);
 }
 
+socket.on('login', onLogin);
+socket.on('logout', onLogout);
 socket.on('drawing', onDrawingEvent);
+
 
 function drawLineInCtx(ctx, x0, y0, x1, y1, color) {
   ctx.beginPath();
@@ -65,16 +94,16 @@ function onMouseDown(e) {
   // deselect any text etc
   window.getSelection().removeAllRanges();
   drawing = true;
-  current.x = e.clientX;
-  current.y = e.clientY;
+  clientData.currentPos.x = e.clientX;
+  clientData.currentPos.y = e.clientY;
 }
 
 function onMouseUp(e) {
   if (drawing) {
     drawing = false;
     let canvasRect = canvas.getBoundingClientRect();
-    drawLine(current.x - canvasRect.left, current.y - canvasRect.top,
-       e.clientX - canvasRect.left, e.clientY - canvasRect.top, current.color, true);
+    drawLine(clientData.currentPos.x - canvasRect.left, clientData.currentPos.y - canvasRect.top,
+       e.clientX - canvasRect.left, e.clientY - canvasRect.top, clientData.selectedColor, true);
   }
 }
 
@@ -84,10 +113,10 @@ function debug(msg) {
 function onMouseMove(e) {
   if (drawing) {
     let canvasRect = canvas.getBoundingClientRect();
-    drawLine(current.x - canvasRect.left, current.y - canvasRect.top,
-       e.clientX - canvasRect.left, e.clientY - canvasRect.top, current.color, true);
-    current.x = e.clientX;
-    current.y = e.clientY;
+    drawLine(clientData.currentPos.x - canvasRect.left, clientData.currentPos.y - canvasRect.top,
+       e.clientX - canvasRect.left, e.clientY - canvasRect.top, clientData.selectedColor, true);
+    clientData.currentPos.x = e.clientX;
+    clientData.currentPos.y = e.clientY;
   }
 }
 
@@ -114,6 +143,11 @@ function onDrawingEvent(data) {
   drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
 }
 
+function clearAndRedrawLines() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(canvasBuffer, 0, 0);
+}
+
 function onResize() {
   // I want to keep the state. By default it clears the canvas on resize!
   const newWidth = window.innerWidth * .75;
@@ -125,5 +159,5 @@ function onResize() {
   canvasBuffer.width = newWidth;
   canvasBuffer.height = newHeight;
   ctxBuffer.drawImage(canvas, 0, 0);
-  refreshCurrentColorRect();
+  refreshComponents();
 }
