@@ -145,6 +145,11 @@ function onDrawingEvent(data) {
 
 function clearAndRedrawLines() {
   ctx.fillStyle = "black";
+  var grd = ctx.createLinearGradient(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+  grd.addColorStop(0, "#080808");
+  grd.addColorStop(1, "#343434");
+
+  ctx.fillStyle = grd;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(canvasBuffer, 0, 0);
 }
