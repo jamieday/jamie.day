@@ -68,7 +68,7 @@ function drawLineInCtx(ctx, x0, y0, x1, y1, color) {
   ctx.moveTo(x0, y0);
   ctx.lineTo(x1, y1);
   ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3;
   ctx.stroke();
   ctx.closePath();
 }
@@ -144,7 +144,8 @@ function onDrawingEvent(data) {
 }
 
 function clearAndRedrawLines() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(canvasBuffer, 0, 0);
 }
 

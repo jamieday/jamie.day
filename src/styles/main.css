@@ -117,7 +117,6 @@ h1 {
 .blackboard {
   cursor: crosshair;
   user-select: none;
-  background-color: black;
   border-radius: 15px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
