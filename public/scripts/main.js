@@ -1,3 +1,37 @@
+const J$ = selector => { return document.querySelector(selector) };
+const util = {
+  escapeHtml: html => {
+    let text = document.createTextNode(html);
+    let div = document.createElement("div");
+    div.appendChild(text);
+    return div.innerHTML;
+  }
+};
+let ws = {
+  socket: io(),
+  _totalOnline: 0,
+  set totalOnline(value) {
+    this._totalOnline = value;
+    const countElement = J$(".online-count");
+    countElement.style.visibility = "visible";
+    countElement.innerHTML = `${util.escapeHtml(ws.totalOnline)} <span style="color:#FFEB3B">online</span>`;
+  },
+  get totalOnline() {
+    return this._totalOnline;
+  }
+};
+
+ws.socket.on('login', onLogin);
+ws.socket.on('logout', onLogout);
+
+function onLogin(data) {
+  ws.totalOnline = data.totalOnline;
+}
+
+function onLogout(data) {
+  ws.totalOnline = data.totalOnline;
+}
+
 let updateBgImgHeight = () => {
   document.getElementsByClassName("jm-background-img")[0].style.height =
     `${document.getElementsByClassName("bg-content")[0].offsetHeight + 70}px`;
@@ -24,14 +58,6 @@ let preloadImages = imageUrls => {
 };
 preloadImages(backgroundImages);
 window.onload = () => {
-  let util = {
-    escapeHtml: html => {
-      let text = document.createTextNode(html);
-      let div = document.createElement("div");
-      div.appendChild(text);
-      return div.innerHTML;
-    }
-  };
   handleBgImages(util);
   handleJmConsole(util);
 };
@@ -98,22 +124,9 @@ let handleJmConsole = util => {
         }
       },
       "blackboard": {
-        description: "show/hide the blackboard!",
+        description: "show/hide the blackboard",
         run: () => {
-          let contentElement = document.getElementsByClassName("content")[0];
-          let blackboardContainer = document.getElementsByClassName("blackboard-container");
-          if (blackboardContainer.length) {
-            contentElement.removeChild(blackboardContainer[0]);
-            setInstructions("See ya later bb.");
-          } else {
-            let blackboard = new Blackboard();
-            contentElement.appendChild(blackboard.element);
-            blackboard.element.scrollIntoView({
-              behavior: "smooth",
-              block: "end",
-            });
-            resetConsole();
-          }
+          toggleBlackboard(true);
         }
       },
       "changebg": {
@@ -164,10 +177,25 @@ let handleJmConsole = util => {
     setInstructions(welcomeMsg);
   }
   resetConsole();
-  setInstructions("Launching blackboard...");
-  setTimeout(() => {
-    processCmdLoggedIn("blackboard");
-  }, 2500);
+  let toggleBlackboard = (scrollTo = false) => {
+    let contentElement = document.getElementsByClassName("content")[0];
+    let blackboardContainer = document.getElementsByClassName("blackboard-container");
+    if (blackboardContainer.length) {
+      contentElement.removeChild(blackboardContainer[0]);
+      setInstructions("See ya later bb.");
+    } else {
+      let blackboard = new Blackboard(ws);
+      contentElement.appendChild(blackboard.element);
+      if (scrollTo) {
+        blackboard.element.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }
+      resetConsole();
+    }
+  };
+  setTimeout(toggleBlackboard, 1000); // todo onFadeInComplete()
   util.consoleLogout = resetConsole;
   let computingCmd = false;
   let processCmd = async cmd => {

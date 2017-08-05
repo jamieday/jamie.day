@@ -1,11 +1,25 @@
 body {
   font-family: 'Open Sans', 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
   background-color: #242424;
+  overflow: hidden;
+  animation: scroll-bar 1s ease 2s 1 forwards; /* todo variables for these #s */
+}
+@keyframes scroll-bar {
+    from {
+      overflow: hidden;
+    }
+    to {
+      overflow: auto;
+    }
 }
 
 .navbar {
   border: none;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+}
+
+.online-count {
+  font-size: 24px;
 }
 
 .jm-background-img {
@@ -102,8 +116,8 @@ h1 {
  */
 
 .blackboard-container {
+  display: flex;
   padding: 15px;
-  animation: fwade-in 1s ease 0s 1 forwards;
   flex-direction: column;
   align-items: center;
 }

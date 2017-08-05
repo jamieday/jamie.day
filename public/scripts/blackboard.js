@@ -3,11 +3,11 @@ const supportedColors = [
 ];
 
 class Blackboard {
-  constructor() {
+  constructor(ws) {
     this.canvas = document.createElement("canvas");
     this.canvas.className = "blackboard";
-    this.canvas.width = Math.floor(window.innerWidth * .75)
-    this.canvas.height = Math.floor(this.canvas.width / 2);
+    this.canvas.width = Math.floor(window.innerWidth)
+    this.canvas.height = 400;
     this.ctx = this.canvas.getContext('2d');
     this.trashImage = new Image();
     this.trashImage.src = "/images/trash.png";
@@ -27,31 +27,41 @@ class Blackboard {
 
     this.element = document.createElement("div");
     this.element.className = "blackboard-container";
-    this.element.style.display = "flex";
-    this.element.style.visibility = "visible";
+    this.element.style.opacity = 0;
+    this.element.style.animation = "fwade-in 1s ease 1s 1 forwards";
     this.element.appendChild(this.canvas);
     this.element.appendChild(this.colors);
 
-    this.socket = io();
+    this.ws = ws;
     this.registerEventListeners();
   }
   registerEventListeners() {
     let self = this;
     let clientData = {
-      totalOnline: 0,
       selectedColor: 'white',
       currentPos: {}
      };
 
-    function redrawTotalOnlineComponent() {
-      self.ctx.fillStyle = 'white';
-      self.ctx.font = '18px sans-serif';
-      self.ctx.textAlign = 'right';
-      self.ctx.textBaseline = 'top';
-      let msg = clientData.totalOnline == 1
-        ? "no one else online :("
-        : `${clientData.totalOnline} online`;
-      self.ctx.fillText(msg, self.canvas.width - 20, 20);
+    function redrawBlackboardTitle() {
+      self.ctx.fillStyle = "white";
+      self.ctx.font = "18px sans-serif";
+      self.ctx.textAlign = "center";
+      self.ctx.textBaseline = "top";
+
+      let titleX = self.canvas.width / 2, titleY = 0;
+      self.ctx.fillText("Interactive Online Blackboard", titleX, titleY);
+
+      self.ctx.beginPath();
+      self.ctx.moveTo(titleX, titleY+30);
+      self.ctx.lineTo(titleX, titleY+50);
+      self.ctx.moveTo(titleX, titleY+50);
+      self.ctx.lineTo(titleX - 7, titleY+42);
+      self.ctx.moveTo(titleX, titleY+50);
+      self.ctx.lineTo(titleX + 7, titleY+42);
+      self.ctx.strokeStyle = self.ctx.fillStyle;
+      self.ctx.lineWidth = 2;
+      self.ctx.stroke();
+      self.ctx.closePath();
     }
     function redrawTrashComponent() {
       // self.ctx.drawImage(self.trashImage, 20, 20, 40, 40);
@@ -64,20 +74,13 @@ class Blackboard {
       }
       el.style.border = "4px solid white";
     }
-    let totalOnline;
-    function onLogin(data) {
-      clientData.totalOnline = data.totalOnline;
-      redrawComponents();
-    }
-    function onLogout(data) {
-      clientData.totalOnline = data.totalOnline;
-      redrawComponents();
-    }
     function redrawComponents() {
       clearAndRedrawLines();
-      redrawTotalOnlineComponent();
+      redrawBlackboardTitle();
       redrawTrashComponent();
     }
+
+    redrawComponents();
 
     let drawing = false;
 
@@ -91,10 +94,7 @@ class Blackboard {
     }
     setCurrentColorByElement(self.colors.children[0]);
 
-    self.socket.on('login', onLogin);
-    self.socket.on('logout', onLogout);
-    self.socket.on('drawing', onDrawingEvent);
-
+    self.ws.socket.on('drawing', onDrawingEvent);
 
     function drawLineInCtx(ctx, x0, y0, x1, y1, color) {
       ctx.beginPath();
@@ -113,7 +113,7 @@ class Blackboard {
         let w = self.canvas.width;
         let h = self.canvas.height;
 
-        self.socket.emit('drawing', {
+        self.ws.socket.emit('drawing', {
           x0: x0 / w,
           y0: y0 / h,
           x1: x1 / w,
@@ -178,14 +178,8 @@ class Blackboard {
     }
 
     function clearAndRedrawLines() {
-      self.ctx.fillStyle = "black";
-      const grd = self.ctx.createLinearGradient(self.canvas.width / 2, 0, self.canvas.width / 2, self.canvas.height);
-      grd.addColorStop(0, "#171717");
-      const bottomColor = "#050505";
-      grd.addColorStop(1, bottomColor);
-      self.colors.style.backgroundColor = bottomColor;
-
-      self.ctx.fillStyle = grd;
+      self.ctx.fillStyle = "#242424";
+      self.colors.style.backgroundColor = self.ctx.fillStyle;
       self.ctx.fillRect(0, 0, self.canvas.width, self.canvas.height);
       self.ctx.drawImage(self.canvasBuffer, 0, 0);
     }
