@@ -171,7 +171,7 @@ let handleJmConsole = util => {
   // Handle commands
   const INIT = 0, LOGGED_IN = 1;
   let state = INIT;
-  const welcomeMsg = "Type `help` for more commands.";
+  const welcomeMsg = "Type `help` for a list of commands.";
   let resetConsole = () => {
     state = LOGGED_IN;
     setInstructions(welcomeMsg);
