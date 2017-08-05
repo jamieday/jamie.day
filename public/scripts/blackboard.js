@@ -6,6 +6,8 @@ class Blackboard {
   constructor() {
     this.canvas = document.createElement("canvas");
     this.canvas.className = "blackboard";
+    this.canvas.width = Math.floor(window.innerWidth * .75)
+    this.canvas.height = Math.floor(this.canvas.width / 2);
     this.ctx = this.canvas.getContext('2d');
     this.trashImage = new Image();
     this.trashImage.src = "/images/trash.png";
@@ -15,6 +17,7 @@ class Blackboard {
 
     this.colors = document.createElement("div");
     this.colors.className = "colors";
+    this.colors.style.width = `${this.canvas.width}px`;
     for (let supportedColor of supportedColors) {
       let color = document.createElement("div");
       color.className = "color";
@@ -39,9 +42,6 @@ class Blackboard {
       selectedColor: 'white',
       currentPos: {}
      };
-
-    window.addEventListener('resize', onResize);
-    onResize();
 
     function redrawTotalOnlineComponent() {
       self.ctx.fillStyle = 'white';
@@ -188,21 +188,6 @@ class Blackboard {
       self.ctx.fillStyle = grd;
       self.ctx.fillRect(0, 0, self.canvas.width, self.canvas.height);
       self.ctx.drawImage(self.canvasBuffer, 0, 0);
-    }
-
-    function onResize() {
-      // I want to keep the state. By default it clears the canvas on resize!
-      const newWidth = Math.floor(window.innerWidth * .75);
-      const newHeight = Math.floor(newWidth / 2);
-      self.colors.style.width = `${newWidth}px`;
-      self.canvas.width = newWidth;
-      self.canvas.height = newHeight;
-      // taking away the width/height stops it from scaling but looks more normal lol
-      self.ctx.drawImage(self.canvasBuffer, 0, 0, newWidth, newHeight);
-      self.canvasBuffer.width = newWidth;
-      self.canvasBuffer.height = newHeight;
-      self.ctxBuffer.drawImage(self.canvas, 0, 0);
-      redrawComponents();
     }
   }
 }

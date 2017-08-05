@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 const server = require('http').createServer(app);
+const favicon = require('serve-favicon');
 const io = require('socket.io')(server);
 const socketHandler = require('./app-sockethandler').createHandler(io);
 const exec = require('child_process').exec;
@@ -18,6 +19,7 @@ let isDev = process.env.ENVIRONMENT === 'DEV';
 let skipPipeline = false;
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 if (isDev) {
   // use styles from source in dev instead of preprocessed
   app.use('/styles', express.static(path.join(__dirname, 'src', 'styles')));
