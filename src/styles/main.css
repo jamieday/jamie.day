@@ -35,22 +35,13 @@ h1 {
     font-size: 64px;
 }
 .content {
-  color :white;
-  width: 100vw;
-  height: 100%;
-  border-radius: 3px;
-  padding: 20px 0 0 0;
-  margin: auto;
-
-  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  color: white;
+  overflow: hidden; /* Ensures the content is not revealed until the type-in animation */
   letter-spacing: .15em; /* Adjust as needed */
 }
 #jm-console {
   display: inline-block;
   padding: 15px;
-  margin-top: 40px;
-  margin-left: auto;
-  margin-right: auto;
   text-align: left;
   color: #BDBDBD;
   background-color: rgba(33,33,33,1);
@@ -91,12 +82,12 @@ h1 {
 }
 .icon-circular {
   display: block;
+  margin: 20px auto;
   background: #ccc;
   border-radius: 50%;
   overflow: hidden;
   width: 100px;
   height: 100px;
-  margin: auto;
   border: 2px solid white;
 }
 .icon-circular img {
@@ -108,12 +99,12 @@ h1 {
  */
 
 .blackboard-container {
-  display: flex;
+  /* don't ask. */
+  margin-top: 25px;
+  animation: fwade-in 1s ease 0s 1 forwards;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  box-sizing: border-box;
+  padding: 30px;
 }
 
 .blackboard {
@@ -130,8 +121,6 @@ h1 {
   padding-bottom: 5px;
   justify-content: center;
   align-items: center;
-  width: 75%;
-  background-color: #343434;
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
 }
@@ -143,10 +132,3 @@ h1 {
   border-radius: 50%;
   margin-right: 5px;
 }
-
-.color.white { background-color: white; }
-.color.red { background-color: red; }
-.color.green { background-color: green; }
-.color.blue { background-color: blue; }
-.color.yellow { background-color: yellow; }
-.color.pink { background-color: #E91E63; }

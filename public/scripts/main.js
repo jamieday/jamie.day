@@ -1,15 +1,28 @@
-const backgroundImages = [
+let updateBgImgHeight = () => {
+  document.getElementsByClassName("jm-background-img")[0].style.height =
+    `${document.getElementsByClassName("bg-content")[0].offsetHeight + 70}px`;
+};
+setTimeout(updateBgImgHeight, 1000);
+function shuffle(a) {
+    for (let i = a.length; i; i--) {
+        let j = Math.floor(Math.random() * i);
+        [a[i - 1], a[j]] = [a[j], a[i - 1]];
+    }
+    return a;
+}
+const backgroundImages = shuffle([
   "http://wallpapercave.com/wp/zm8bgId.jpg",
   "https://s-media-cache-ak0.pinimg.com/originals/31/80/d2/3180d2c319d8400c096696b687f9a5b5.jpg",
   "/images/sexy-image.jpg",
   "https://image.freepik.com/free-psd/abstract-background-design_1297-84.jpg",
-];
+]);
 let preloadImages = imageUrls => {
   for (let i=0; i<imageUrls.length; i++) {
     let img = new Image();
     img.src = imageUrls[i];
   }
 };
+preloadImages(backgroundImages);
 window.onload = () => {
   let util = {
     escapeHtml: html => {
@@ -24,7 +37,6 @@ window.onload = () => {
 };
 
 let handleBgImages = util => {
-  preloadImages(backgroundImages);
   let bgElement = document.getElementsByClassName("jm-background-img")[0];
   let bgIndex = 0;
   bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++]}')`;
@@ -37,7 +49,30 @@ let handleBgImages = util => {
 let handleJmConsole = util => {
   let consoleElement = document.getElementById("jm-console-input");
   let consoleInstructionsElement = document.getElementById("jm-console-instructions");
-  let setInstructions = instruction => { consoleInstructionsElement.innerHTML = instruction; };
+  let setInstructions = instruction => {
+    let toHtml = instruction => {
+      let html = "";
+      for (let i = 0; i < instruction.length; i++) {
+        if (instruction.charAt(i) == "`") {
+          for (let j = i+1; j < instruction.length; j++) {
+            if (instruction.charAt(j) == "`") {
+              let opening = '<span style="color: #ef5350">';
+              let closing = '</span>';
+              instruction = instruction.substring(0, i)
+                + opening
+                + instruction.substring(i+1, j)
+                + closing
+                + instruction.substring(j+1);
+              i = j + closing.length;
+              break;
+            }
+          }
+        }
+      }
+      return instruction;
+    };
+    consoleInstructionsElement.innerHTML = toHtml(instruction);
+  };
   util.clearConsole = () => {
     consoleElement.value = "";
   };
@@ -56,10 +91,31 @@ let handleJmConsole = util => {
               aliasesStr = separator;
               aliasesStr += command.aliases.join(separator);
             }
-            helpAvailableCmds += `${key}${aliasesStr} - ${commands[key].description}<br>`;
+            helpAvailableCmds += `\`${key}${aliasesStr}\` - ${commands[key].description}<br>`;
           }
           helpAvailableCmds += "<br>More commands available soon™.";
           setInstructions(helpAvailableCmds);
+        }
+      },
+      "blackboard": {
+        description: "show/hide the blackboard!",
+        run: () => {
+          let contentElement = document.getElementsByClassName("content")[0];
+          let blackboardContainer = document.getElementsByClassName("blackboard-container");
+          if (blackboardContainer.length) {
+            contentElement.removeChild(blackboardContainer[0]);
+            setInstructions("See ya later bb.");
+          } else {
+            console.fullMode = false;
+
+            let blackboard = new Blackboard();
+            contentElement.appendChild(blackboard.element);
+            blackboard.element.scrollIntoView({
+              behavior: "smooth",
+              block: "end",
+            });
+            setInstructions("Here it comes!");
+          }
         }
       },
       "changebg": {
@@ -76,7 +132,7 @@ let handleJmConsole = util => {
         }
       },
       "exit": {
-        description: "\"get me outta here\"",
+        description: "get me outta here",
         run: () => {
           util.consoleLogout();
         },
@@ -94,50 +150,45 @@ let handleJmConsole = util => {
         return;
       }
     }
-    setInstructions(`"${cmd}" is not a recognized command 😢
-      <br>If you want a list of available commands, try "help"`);
+    setInstructions(`\`${cmd}\` is not a recognized command 😢
+      <br>If you want a list of available commands, try \`help\``);
   };
 
+  async function sleep(ms) {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  }
   // Handle commands
-  const INIT = 0, LOGGED_IN = 1;;
+  const INIT = 0, LOGGED_IN = 1;
   let state = INIT;
-  const welcomeMsg = "Type \"jamie is the best\" to begin!";
+  const welcomeMsg = "Access unlocked.<br>Type `blackboard`, or `help` for more commands.";
   let resetConsole = () => {
-    state = INIT;
+    state = LOGGED_IN;
     setInstructions(welcomeMsg);
   }
   resetConsole();
   util.consoleLogout = resetConsole;
-  let swagTimeout, hacked;
   let computingCmd = false;
   let processCmd = async cmd => {
     util.clearConsole();
     if (!cmd) return;
     switch (state) {
       case INIT:
-        if (cmd === "jamie is the best") {
-          if (swagTimeout) clearTimeout(swagTimeout);
+        if (cmd === "CORRECT_PASSWORD") {
           setInstructions("Validating password...");
           consoleElement.disabled = true;
-          await (new Promise((resolve) => setTimeout(resolve, 400+Math.random()*300)));
+          await sleep(400 + Math.random()*300);
           setInstructions("Access unlocked.<br>"
-           + " Try \"help\" to start off.");
+           + " Try `help` to start off.");
            consoleElement.disabled = false;
            consoleElement.focus();
-          state = LOGGED_IN;
-        } else if (!hacked && cmd === "jamie is the worst") {
-          setInstructions("Hacking your computer.. please don't close this window.");
-          swagTimeout = setTimeout(() => {
-            setInstructions("You are now hacked."
-              + "<br>If you wish to be unhacked, simply type \"jamie is the best\".");
-            hacked = true;
-          }, 2500);
+           state = LOGGED_IN;
         }
         break;
       case LOGGED_IN:
         processCmdLoggedIn(cmd);
         break;
     }
+    updateBgImgHeight();
   };
 
   // Add key events for handling input
