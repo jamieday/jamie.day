@@ -14,7 +14,7 @@ let ws = {
     this._totalOnline = value;
     const countElement = J$(".online-count");
     countElement.style.visibility = "visible";
-    countElement.innerHTML = `${util.escapeHtml(ws.totalOnline)} <span style="color:#FFEB3B">online</span>`;
+    countElement.innerHTML = `${util.escapeHtml(ws.totalOnline)} <span style="color:#BDBDBD">online</span>`;
   },
   get totalOnline() {
     return this._totalOnline;
