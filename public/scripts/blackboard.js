@@ -58,8 +58,9 @@ class Blackboard {
     }
     function setCurrentColorByElement(el) {
       clientData.selectedColor = el.style.backgroundColor;
-      for (let colorElement of self.colors.children) {
-        colorElement.style.border = "4px solid grey";
+      // can't do for of on htmlcollection in safari :(
+      for (let i=0; i<self.colors.children.length; i++) {
+        self.colors.children[i].style.border = "4px solid grey";
       }
       el.style.border = "4px solid white";
     }
@@ -85,8 +86,8 @@ class Blackboard {
     self.canvas.addEventListener('mouseout', onMouseUp);
     self.canvas.addEventListener('mousemove', throttle(onMouseMove, 10));
 
-    for (let colorElement of self.colors.children) {
-      colorElement.addEventListener('click', onColorUpdate);
+    for (let i=0; i<self.colors.children.length; i++) {
+      self.colors.children[i].addEventListener('click', onColorUpdate);
     }
     setCurrentColorByElement(self.colors.children[0]);
 
@@ -143,9 +144,6 @@ class Blackboard {
       }
     }
 
-    function debug(msg) {
-      document.getElementById("jm-console-instructions").textContent = msg;
-    }
     function onMouseMove(e) {
       if (drawing) {
         let canvasRect = self.canvas.getBoundingClientRect();

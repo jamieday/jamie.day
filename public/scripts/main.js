@@ -11,10 +11,10 @@ function shuffle(a) {
     return a;
 }
 const backgroundImages = shuffle([
-  "http://wallpapercave.com/wp/zm8bgId.jpg",
-  "https://s-media-cache-ak0.pinimg.com/originals/31/80/d2/3180d2c319d8400c096696b687f9a5b5.jpg",
-  "/images/sexy-image.jpg",
-  "https://image.freepik.com/free-psd/abstract-background-design_1297-84.jpg",
+  "/images/bluebox-wallpaper.jpg",
+  "/images/lightblue-wallpaper.jpg",
+  "/images/prism-wallpaper.jpg",
+  "/images/green-wallpaper.jpg",
 ]);
 let preloadImages = imageUrls => {
   for (let i=0; i<imageUrls.length; i++) {
@@ -39,11 +39,11 @@ window.onload = () => {
 let handleBgImages = util => {
   let bgElement = document.getElementsByClassName("jm-background-img")[0];
   let bgIndex = 0;
-  bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++]}')`;
   bgElement.style.transition = "background-image 1s";
   util.changeBg = () => {
     bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++ % backgroundImages.length]}')`;
   };
+  util.changeBg();
 };
 
 let handleJmConsole = util => {
@@ -106,15 +106,13 @@ let handleJmConsole = util => {
             contentElement.removeChild(blackboardContainer[0]);
             setInstructions("See ya later bb.");
           } else {
-            console.fullMode = false;
-
             let blackboard = new Blackboard();
             contentElement.appendChild(blackboard.element);
             blackboard.element.scrollIntoView({
               behavior: "smooth",
               block: "end",
             });
-            setInstructions("Here it comes!");
+            resetConsole();
           }
         }
       },
@@ -160,12 +158,16 @@ let handleJmConsole = util => {
   // Handle commands
   const INIT = 0, LOGGED_IN = 1;
   let state = INIT;
-  const welcomeMsg = "Access unlocked.<br>Type `blackboard`, or `help` for more commands.";
+  const welcomeMsg = "Type `help` for more commands.";
   let resetConsole = () => {
     state = LOGGED_IN;
     setInstructions(welcomeMsg);
   }
   resetConsole();
+  setInstructions("Launching blackboard...");
+  setTimeout(() => {
+    processCmdLoggedIn("blackboard");
+  }, 2500);
   util.consoleLogout = resetConsole;
   let computingCmd = false;
   let processCmd = async cmd => {
