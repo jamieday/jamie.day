@@ -39,6 +39,9 @@ h1 {
   overflow: hidden; /* Ensures the content is not revealed until the type-in animation */
   letter-spacing: .15em; /* Adjust as needed */
 }
+.bg-content {
+  margin-bottom: 26px;
+}
 #jm-console {
   display: inline-block;
   padding: 15px;
@@ -99,12 +102,10 @@ h1 {
  */
 
 .blackboard-container {
-  /* don't ask. */
-  margin-top: 25px;
+  padding: 15px;
   animation: fwade-in 1s ease 0s 1 forwards;
   flex-direction: column;
   align-items: center;
-  padding: 30px;
 }
 
 .blackboard {
