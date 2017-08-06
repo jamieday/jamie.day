@@ -42,6 +42,20 @@ class Blackboard {
       currentPos: {}
      };
 
+     function drawArrow(x, y) {
+       self.ctx.beginPath();
+       self.ctx.moveTo(x, y);
+       self.ctx.lineTo(x, y+17);
+       self.ctx.moveTo(x, y+17);
+       self.ctx.lineTo(x - 7, y + 12);
+       self.ctx.moveTo(x, y+17);
+       self.ctx.lineTo(x + 7, y+12);
+       self.ctx.strokeStyle = self.ctx.fillStyle;
+       self.ctx.lineWidth = 2;
+       self.ctx.stroke();
+       self.ctx.closePath();
+     }
+
     function redrawBlackboardTitle() {
       self.ctx.fillStyle = "white";
       self.ctx.font = "18px sans-serif";
@@ -50,18 +64,8 @@ class Blackboard {
 
       let titleX = self.canvas.width / 2, titleY = 0;
       self.ctx.fillText("Interactive Online Blackboard", titleX, titleY);
-
-      self.ctx.beginPath();
-      self.ctx.moveTo(titleX, titleY+30);
-      self.ctx.lineTo(titleX, titleY+50);
-      self.ctx.moveTo(titleX, titleY+50);
-      self.ctx.lineTo(titleX - 7, titleY+42);
-      self.ctx.moveTo(titleX, titleY+50);
-      self.ctx.lineTo(titleX + 7, titleY+42);
-      self.ctx.strokeStyle = self.ctx.fillStyle;
-      self.ctx.lineWidth = 2;
-      self.ctx.stroke();
-      self.ctx.closePath();
+      drawArrow(titleX-133, titleY+3);
+      drawArrow(titleX+133, titleY+3);
     }
     function redrawTrashComponent() {
       // self.ctx.drawImage(self.trashImage, 20, 20, 40, 40);
