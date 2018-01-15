@@ -182,7 +182,7 @@ let handleJmConsole = util => {
     let blackboardContainer = document.getElementsByClassName("blackboard-container");
     if (blackboardContainer.length) {
       contentElement.removeChild(blackboardContainer[0]);
-      setInstructions("See ya later bb.");
+      setInstructions("Board of that.");
     } else {
       let blackboard = new Blackboard(ws);
       contentElement.appendChild(blackboard.element);
