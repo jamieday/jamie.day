@@ -1,3 +1,0 @@
-ajax login checks with little loading symbol
-make a debug console as a component on the page
-look into the already stuff on server.js
