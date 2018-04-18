@@ -10,10 +10,10 @@ const exec = require('child_process').exec;
 const config = require('./config');
 const port = process.env.PORT || 5050
 
-if (!process.env.ENVIRONMENT) {
-  console.error("ERR: No environment specified (e.g., DEV / STAGING / PRODUCTION)");
-  process.exit(1);
-}
+const env = process.env.ENVIRONMENT || (() => {
+  console.error('Warning: No environment specified, defaulting to DEV');
+  return 'DEV';
+})();
 
 const isDev = process.env.ENVIRONMENT === 'DEV';
 const skipCssPipeline = isDev;
