@@ -15,15 +15,14 @@ if (!process.env.ENVIRONMENT) {
   process.exit(1);
 }
 
-let isDev = process.env.ENVIRONMENT === 'DEV';
-let skipPipeline = false;
+const isDev = process.env.ENVIRONMENT === 'DEV';
+const skipCssPipeline = isDev;
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
-if (isDev) {
+if (skipCssPipeline) {
   // use styles from source in dev instead of preprocessed
   app.use('/styles', express.static(path.join(__dirname, 'src', 'styles')));
-  skipPipeline = true;
 }
 
 // views is directory for all template files
@@ -74,15 +73,23 @@ async function executeCommand(cmd) {
   });
 }
 
-async function executeCssPipeline() {
+async function executePipeline(command) {
   try {
-    let output = await executeCommand("mkdir -p public/styles && node_modules/.bin/postcss src/styles/main.css --use autoprefixer | node_modules/.bin/cssmin >public/styles/main.css");
+    let output = await executeCommand(command);
     if (output.stdout) console.log(output.stdout);
     if (output.stderr) console.error(output.stderr);
   } catch (e) {
     console.error(e.message);
     process.exit(1);
   }
+}
+
+async function executeJsPipeline() {
+  await executePipeline("tsc -p src/scripts");
+}
+
+async function executeCssPipeline() {
+  await executePipeline("mkdir -p public/styles && node_modules/.bin/postcss src/styles/main.css --use autoprefixer | node_modules/.bin/cssmin >public/styles/main.css");
 };
 
 async function listen(port) {
@@ -95,7 +102,8 @@ async function listen(port) {
 }
 
 async function runApp() {
-  if (!skipPipeline) await executeCssPipeline();
+  await executeJsPipeline();
+  if (!skipCssPipeline) await executeCssPipeline();
   await listen(port);
   console.log(`[${process.env.ENVIRONMENT}] Kicking it on port ${port}`);
 }

@@ -1,5 +1,7 @@
 # Custom
 public/styles/
+public/scripts/
+built/
 
 # Logs
 logs

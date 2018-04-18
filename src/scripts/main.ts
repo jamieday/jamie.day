@@ -1,20 +1,18 @@
-const J$ = selector => { return document.querySelector(selector) };
-const util = {
-  escapeHtml: html => {
-    let text = document.createTextNode(html);
-    let div = document.createElement("div");
-    div.appendChild(text);
-    return div.innerHTML;
-  }
-};
-let ws = {
+declare function io(): any;
+
+import { J$, escapeHtml } from './util.js';
+import { LoginPayload } from './socket-payloads.js';
+import Blackboard from './blackboard.js';
+
+const ws = {
   socket: io(),
   _totalOnline: 0,
   set totalOnline(value) {
     this._totalOnline = value;
-    const countElement = J$(".online-count");
+
+    const countElement = <HTMLElement> J$(".online-count");
     countElement.style.visibility = "visible";
-    countElement.innerHTML = `${util.escapeHtml(ws.totalOnline)} <span style="color:#BDBDBD">online</span>`;
+    countElement.innerHTML = `${escapeHtml(ws.totalOnline.toString())} <span style="color:#BDBDBD">online</span>`;
   },
   get totalOnline() {
     return this._totalOnline;
@@ -24,66 +22,71 @@ let ws = {
 ws.socket.on('login', onLogin);
 ws.socket.on('logout', onLogout);
 
-function onLogin(data) {
+function onLogin(data: LoginPayload) {
   ws.totalOnline = data.totalOnline;
 }
 
-function onLogout(data) {
+function onLogout(data: LoginPayload) {
   ws.totalOnline = data.totalOnline;
 }
 
-let updateBgImgHeight = () => {
-  document.getElementsByClassName("jm-background-img")[0].style.height =
-    `${document.getElementsByClassName("bg-content")[0].offsetHeight + 70}px`;
+const getBackgroundImageElement = () => <HTMLElement> document.getElementsByClassName("jm-background-img")[0];
+
+const updateBgImgHeight = () => {
+  getBackgroundImageElement().style.height =
+    `${(<HTMLElement> document.getElementsByClassName("bg-content")[0]).offsetHeight + 70}px`;
 };
+
 setTimeout(updateBgImgHeight, 1000);
-function shuffle(a) {
+function shuffle<T>(a: T[]) {
     for (let i = a.length; i; i--) {
         let j = Math.floor(Math.random() * i);
         [a[i - 1], a[j]] = [a[j], a[i - 1]];
     }
     return a;
 }
-const backgroundImages = shuffle([
-  "/images/bluebox-wallpaper.jpg",
-  "/images/lightblue-wallpaper.jpg",
-  "/images/prism-wallpaper.jpg",
-  "/images/green-wallpaper.jpg",
-]);
-let preloadImages = imageUrls => {
-  for (let i=0; i<imageUrls.length; i++) {
-    let img = new Image();
-    img.src = imageUrls[i];
-  }
-};
-preloadImages(backgroundImages);
+
+// preload images
+const backgroundImages = 
+  ["/images/prism-wallpaper.jpg"] // this one always first
+  .concat(shuffle([
+    "/images/bluebox-wallpaper.jpg",
+    "/images/lightblue-wallpaper.jpg",
+    "/images/green-wallpaper.jpg"
+]));
+for (let i=0; i<backgroundImages.length; i++) {
+  let img = new Image();
+  img.src = backgroundImages[i];
+}
+
 window.onload = () => {
-  handleBgImages(util);
-  handleJmConsole(util);
+  handleBgImages();
+  handleJmConsole();
 };
 
-let handleBgImages = util => {
-  let bgElement = document.getElementsByClassName("jm-background-img")[0];
+let changeBg: () => void;
+
+const handleBgImages = () => {
+  const bgElement = getBackgroundImageElement();
   let bgIndex = 0;
   bgElement.style.transition = "background-image 1s";
-  util.changeBg = () => {
+  changeBg = () => {
     bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++ % backgroundImages.length]}')`;
-  };
-  util.changeBg();
+  }
+  changeBg();
 };
 
-let handleJmConsole = util => {
-  let consoleElement = document.getElementById("jm-console-input");
-  let consoleInstructionsElement = document.getElementById("jm-console-instructions");
-  let setInstructions = instruction => {
-    let toHtml = instruction => {
-      let html = "";
+const handleJmConsole = () => {
+  const consoleElement = <HTMLInputElement> J$("#jm-console-input");
+  const consoleInstructionsElement = J$("#jm-console-instructions");
+  const setInstructions = (instruction: string) => {
+    const toHtml = (instruction: string) => {
       for (let i = 0; i < instruction.length; i++) {
         if (instruction.charAt(i) == "`") {
           for (let j = i+1; j < instruction.length; j++) {
             if (instruction.charAt(j) == "`") {
-              let opening = '<span style="color: #ef5350">';
-              let closing = '</span>';
+              const opening = '<span style="color: #ef5350">';
+              const closing = '</span>';
               instruction = instruction.substring(0, i)
                 + opening
                 + instruction.substring(i+1, j)
@@ -99,17 +102,23 @@ let handleJmConsole = util => {
     };
     consoleInstructionsElement.innerHTML = toHtml(instruction);
   };
-  util.clearConsole = () => {
+  const clearConsole = () => {
     consoleElement.value = "";
   };
 
-  let processCmdLoggedIn = cmd => {
-    const commands = {
+  interface Command {
+    description: string;
+    run: () => void;
+    aliases?: string[];
+  }
+
+  let processCmdLoggedIn = (cmd: string) => {
+    const commands: { [index:string] : Command } = {
       "help": {
         description: "list all available commands",
         run: () => {
           let helpAvailableCmds = "";
-          for (key in commands) {
+          for (const key in commands) {
             let command = commands[key];
             let aliasesStr = '';
             if (command.aliases) {
@@ -132,7 +141,7 @@ let handleJmConsole = util => {
       "changebg": {
         description: "change the background",
         run: () => {
-          util.changeBg();
+          changeBg();
           setInstructions("Background changed.");
         }
       },
@@ -145,13 +154,13 @@ let handleJmConsole = util => {
       "exit": {
         description: "get me outta here",
         run: () => {
-          util.consoleLogout();
+          resetConsole();
         },
         aliases: ["logout"]
       }
     };
-    for (key in commands) {
-      let command = commands[key];
+    for (const key in commands) {
+      const command = commands[key];
       if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
         commands[key].run();
         return;
@@ -165,7 +174,7 @@ let handleJmConsole = util => {
       <br>If you want a list of available commands, try \`help\``);
   };
 
-  async function sleep(ms) {
+  async function sleep(ms: number) {
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
   // Handle commands
@@ -177,14 +186,14 @@ let handleJmConsole = util => {
     setInstructions(welcomeMsg);
   }
   resetConsole();
-  let toggleBlackboard = (scrollTo = false) => {
-    let contentElement = document.getElementsByClassName("content")[0];
-    let blackboardContainer = document.getElementsByClassName("blackboard-container");
+  const toggleBlackboard = (scrollTo = false) => {
+    const contentElement = document.getElementsByClassName("content")[0];
+    const blackboardContainer = document.getElementsByClassName("blackboard-container");
     if (blackboardContainer.length) {
       contentElement.removeChild(blackboardContainer[0]);
       setInstructions("Board of that.");
     } else {
-      let blackboard = new Blackboard(ws);
+      const blackboard = new Blackboard(ws);
       contentElement.appendChild(blackboard.element);
       if (scrollTo) {
         blackboard.element.scrollIntoView({
@@ -196,10 +205,9 @@ let handleJmConsole = util => {
     }
   };
   setTimeout(toggleBlackboard, 1000); // todo onFadeInComplete()
-  util.consoleLogout = resetConsole;
   let computingCmd = false;
-  let processCmd = async cmd => {
-    util.clearConsole();
+  let processCmd = async (cmd: string) => {
+    clearConsole();
     if (!cmd) return;
     switch (state) {
       case INIT:
@@ -226,13 +234,13 @@ let handleJmConsole = util => {
     e = e || window.event;
     let keyCode = e.keyCode || e.which;
     if (keyCode == 13) {
-      processCmd(util.escapeHtml(consoleElement.value));
+      processCmd(escapeHtml(consoleElement.value));
       return false;
     }
   };
 
-  // Focus console input is console is clicked
-  document.getElementById("jm-console").onclick = () => {
+  // Focus console input if console is clicked
+  (<HTMLElement> J$("#jm-console")).onclick = () => {
     consoleElement.focus();
   };
 };

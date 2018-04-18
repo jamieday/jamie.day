@@ -1,19 +1,34 @@
+import { DrawingPayload } from './socket-payloads.js';
+
 const supportedColors = [
   "#E0E0E0", "#f44336", "#4CAF50", "#2196F3", "#FFEB3B  ", "#E91E63"
 ];
 
-class Blackboard {
-  constructor(ws) {
+export default class Blackboard {
+  ws: any;
+
+  canvas: HTMLCanvasElement;
+  canvasBuffer: HTMLCanvasElement;
+
+  ctx: CanvasRenderingContext2D;
+  ctxBuffer: CanvasRenderingContext2D;
+
+  trashImage: HTMLImageElement;
+
+  colors: HTMLDivElement;
+  element: HTMLDivElement;
+
+  constructor(ws: any) {
     this.canvas = document.createElement("canvas");
     this.canvas.className = "blackboard";
     this.canvas.width = Math.floor(window.innerWidth)
     this.canvas.height = 400;
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = <CanvasRenderingContext2D> this.canvas.getContext('2d');
     this.trashImage = new Image();
     this.trashImage.src = "/images/trash.png";
 
     this.canvasBuffer = document.createElement('canvas');
-    this.ctxBuffer = this.canvasBuffer.getContext('2d');
+    this.ctxBuffer = <CanvasRenderingContext2D> this.canvasBuffer.getContext('2d');
 
     this.colors = document.createElement("div");
     this.colors.className = "colors";
@@ -27,7 +42,7 @@ class Blackboard {
 
     this.element = document.createElement("div");
     this.element.className = "blackboard-container";
-    this.element.style.opacity = 0;
+    this.element.style.opacity = "0";
     this.element.style.animation = "fwade-in 1s ease 1s 1 forwards";
     this.element.appendChild(this.canvas);
     this.element.appendChild(this.colors);
@@ -39,10 +54,10 @@ class Blackboard {
     let self = this;
     let clientData = {
       selectedColor: 'white',
-      currentPos: {}
+      currentPos: { x: 0, y: 0 }
      };
 
-     function drawArrow(x, y) {
+     function drawArrow(x: number, y: number) {
        self.ctx.beginPath();
        self.ctx.moveTo(x, y);
        self.ctx.lineTo(x, y+17);
@@ -70,11 +85,11 @@ class Blackboard {
     function redrawTrashComponent() {
       // self.ctx.drawImage(self.trashImage, 20, 20, 40, 40);
     }
-    function setCurrentColorByElement(el) {
-      clientData.selectedColor = el.style.backgroundColor;
+    function setCurrentColorByElement(el: HTMLElement) {
+      clientData.selectedColor = el.style.backgroundColor || "white";
       // can't do for of on htmlcollection in safari :(
       for (let i=0; i<self.colors.children.length; i++) {
-        self.colors.children[i].style.border = "4px solid grey";
+        (<HTMLElement> self.colors.children[i]).style.border = "4px solid grey";
       }
       el.style.border = "4px solid white";
     }
@@ -91,16 +106,16 @@ class Blackboard {
     self.canvas.addEventListener('mousedown', onMouseDown);
     self.canvas.addEventListener('mouseup', onMouseUp);
     self.canvas.addEventListener('mouseout', onMouseUp);
-    self.canvas.addEventListener('mousemove', throttle(onMouseMove, 10));
+    self.canvas.addEventListener('mousemove', throttled(onMouseMove, 10));
 
     for (let i=0; i<self.colors.children.length; i++) {
       self.colors.children[i].addEventListener('click', onColorUpdate);
     }
-    setCurrentColorByElement(self.colors.children[0]);
+    setCurrentColorByElement(<HTMLElement> self.colors.children[0]);
 
     self.ws.socket.on('drawing', onDrawingEvent);
 
-    function drawLineInCtx(ctx, x0, y0, x1, y1, color) {
+    function drawLineInCtx(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, color: string) {
       ctx.beginPath();
       ctx.moveTo(x0, y0);
       ctx.lineTo(x1, y1);
@@ -109,7 +124,7 @@ class Blackboard {
       ctx.stroke();
       ctx.closePath();
     }
-    function drawLine(x0, y0, x1, y1, color, emit = false) {
+    function drawLine(x0: number, y0: number, x1: number, y1: number, color: string, emit = false) {
       drawLineInCtx(self.ctx, x0, y0, x1, y1, color);
       drawLineInCtx(self.ctxBuffer, x0, y0, x1, y1, color);
 
@@ -117,17 +132,11 @@ class Blackboard {
         let w = self.canvas.width;
         let h = self.canvas.height;
 
-        self.ws.socket.emit('drawing', {
-          x0: x0 / w,
-          y0: y0 / h,
-          x1: x1 / w,
-          y1: y1 / h,
-          color: color
-        });
+        self.ws.socket.emit('drawing', new DrawingPayload(x0 / w, y0 / h, x1 / w, y1 / h, color));
       }
     }
 
-    function onMouseDown(e) {
+    function onMouseDown(e: MouseEvent) {
       e.preventDefault();
       // deselect any text etc
       window.getSelection().removeAllRanges();
@@ -139,7 +148,7 @@ class Blackboard {
         e.clientX - canvasRect.left, e.clientY - canvasRect.top - 1, clientData.selectedColor, true);
     }
 
-    function onMouseUp(e) {
+    function onMouseUp(e: MouseEvent) {
       if (drawing) {
         drawing = false;
         let canvasRect = self.canvas.getBoundingClientRect();
@@ -148,7 +157,7 @@ class Blackboard {
       }
     }
 
-    function onMouseMove(e) {
+    function onMouseMove(e: MouseEvent) {
       if (drawing) {
         let canvasRect = self.canvas.getBoundingClientRect();
         drawLine(clientData.currentPos.x - canvasRect.left, clientData.currentPos.y - canvasRect.top,
@@ -158,14 +167,14 @@ class Blackboard {
       }
     }
 
-    function onColorUpdate(e) {
-      setCurrentColorByElement(e.target);
+    function onColorUpdate(e: Event) {
+      setCurrentColorByElement(<HTMLElement> e.target);
     }
 
     // limit the number of events per second
-    function throttle(callback, delay) {
+    function throttled(callback: Function, delay: number) {
       let previousCall = new Date().getTime();
-      return (...args) => {
+      return (...args: any[]) => {
         let time = new Date().getTime();
 
         if ((time - previousCall) >= delay) {
@@ -175,7 +184,7 @@ class Blackboard {
       };
     }
 
-    function onDrawingEvent(data) {
+    function onDrawingEvent(data: DrawingPayload) {
       let w = self.canvas.width;
       let h = self.canvas.height;
       drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
