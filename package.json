@@ -9,7 +9,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "tsc -p . && tsc -p src/scripts -w & node app.js &"
+    "dev": "tsc -p . && (npm run dev-live; node app.js) &",
+    "devwin": "tsc -p . && npm start",
+    "dev-live": "tsc -p src/scripts -w"
   },
   "dependencies": {
     "autoprefixer": "^7.1.2",

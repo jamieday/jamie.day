@@ -11,11 +11,11 @@ const config = require('./config');
 const port = process.env.PORT || 5050
 
 const env = process.env.ENVIRONMENT || (() => {
-  console.error('Warning: No environment specified, defaulting to DEV');
+  console.warn('Warning: No environment specified, defaulting to DEV');
   return 'DEV';
 })();
 
-const isDev = process.env.ENVIRONMENT === 'DEV';
+const isDev = env === 'DEV';
 const skipCssPipeline = isDev;
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -105,7 +105,7 @@ async function runApp() {
   await executeJsPipeline();
   if (!skipCssPipeline) await executeCssPipeline();
   await listen(port);
-  console.log(`[${process.env.ENVIRONMENT}] Kicking it on port ${port}`);
+  console.log(`[${env}] Kicking it on port ${port}`);
 }
 
 runApp();
