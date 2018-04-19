@@ -128,7 +128,7 @@ const handleJmConsole = () => {
             }
             helpAvailableCmds += `\`${key}${aliasesStr}\` - ${commands[key].description}<br>`;
           }
-          helpAvailableCmds += "<br>More commands available soon™.";
+          helpAvailableCmds += "<br>New commands are actively being developed!";
           setInstructions(helpAvailableCmds);
         }
       },
@@ -149,6 +149,12 @@ const handleJmConsole = () => {
         description: "open my linkedin in a new tab",
         run: () => {
           window.open('https://www.linkedin.com/in/dayjamie/', '_blank');
+        }
+      },
+      "github": {
+        description: "open my github in a new tab",
+        run: () => {
+          window.open('https://github.con/jday370/', '_blank');
         }
       },
       "exit": {
