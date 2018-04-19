@@ -1,26 +1,27 @@
 {
   "name": "jamie-day",
   "author": "Jamie Day",
-  "version": "0.0.1",
+  "version": "2.0.2",
   "description": "Jamie Day Personal Website",
   "engines": {
-    "node": "^8.2.1"
+    "node": "^9.11.1"
   },
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "tsc -p . && (npm run dev-live; node app.js) &",
-    "devwin": "tsc -p . && npm start",
-    "dev-live": "tsc -p src/scripts -w"
+    "start": "tsc -p .; node app.js",
+    "dev": "./dev-server.sh",
+    "dev-win": "bash -c ./dev-server.sh win"
   },
   "dependencies": {
-    "autoprefixer": "^7.1.2",
+    "@types/socket.io": "^1.4.33",
+    "autoprefixer": "^7.2.6",
     "cssmin": "^0.4.3",
-    "ejs": "^2.5.6",
-    "express": "^4.15.3",
-    "postcss-cli": "^4.1.0",
-    "serve-favicon": "^2.4.3",
-    "socket.io": "^2.0.3"
+    "ejs": "^2.5.9",
+    "express": "^4.16.3",
+    "postcss-cli": "^4.1.1",
+    "serve-favicon": "^2.5.0",
+    "socket.io": "^2.0.3",
+    "typescript": "^2.8.1"
   },
   "repository": {},
   "license": "UNLICENSED",
