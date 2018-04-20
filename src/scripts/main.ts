@@ -134,7 +134,22 @@ const handleJmConsole = () => {
       "blackboard": {
         description: "toggle the online blackboard",
         run: () => {
-          toggleBlackboard(true);
+          const containerId = 'blackboard-container';
+          const blackboardContainer = document.getElementById(containerId);
+      
+          if (blackboardContainer !== null) {
+            collapseContent();
+            setInstructions("Board of that! Type `help` for more.");
+          } else {
+            const blackboardContainer = document.createElement("div");
+            blackboardContainer.id = containerId;
+      
+            const blackboard = new Blackboard(ws);
+            blackboard.attachTo(blackboardContainer);
+      
+            showContent(blackboardContainer, true);
+            resetConsole();
+          }
         }
       },
       "changebg": {
@@ -191,31 +206,31 @@ const handleJmConsole = () => {
     setInstructions(welcomeMsg);
   }
   resetConsole();
-  const toggleBlackboard = (scrollTo = false) => {
-    const contentContainer = <HTMLElement> document.getElementsByClassName("content-container")[0];
-    const blackboardContainer = document.getElementsByClassName("blackboard-container");
-    if (blackboardContainer.length) {
-      contentContainer.style.display = "none";
-      contentContainer.removeChild(blackboardContainer[0]);
-      setInstructions("Board of that! Type `help` for more.");
-    } else {
-      contentContainer.style.display = "flex";
-      const blackboardContainer = document.createElement("div");
-      blackboardContainer.className = 'blackboard-container';
+  
+  const getContentContainerElement = () => <HTMLElement> document.getElementsByClassName("content-container")[0];
 
-      const blackboard = new Blackboard(ws);
-      blackboard.attachTo(blackboardContainer);
+  const initialPadding = getContentContainerElement().style.padding;
 
-      contentContainer.appendChild(blackboardContainer);
-      if (scrollTo) {
-        contentContainer.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-        });
-      }
-      resetConsole();
+  function collapseContent() {
+    const contentContainer = getContentContainerElement();
+    contentContainer.style.display = "none";
+    contentContainer.innerHTML = '';
+  }
+  function showContent(newElement: HTMLElement, autoScroll = false) {
+    const contentContainer = getContentContainerElement();
+    contentContainer.style.display = "flex";
+
+    contentContainer.appendChild(newElement);
+
+    if (autoScroll) {
+      contentContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
     }
-  };
+    resetConsole();
+  }
+
   let computingCmd = false;
   let processCmd = async (cmd: string) => {
     clearConsole();
