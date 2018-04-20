@@ -1,17 +1,17 @@
 # Todo List
 
-- ajax login checks with little loading symbol
-
-Start:
-- Login button
-- Signup button
+## Start:
+- Login & signup buttons in console
 
 What's your username?
-$ 
+
+\> [username]
 
 What's your password?
-$ 
+
+\> [password]
 
 Can you type that again please?
-$ 
+
+\> [password]
 
