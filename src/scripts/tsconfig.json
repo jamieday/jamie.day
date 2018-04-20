@@ -4,6 +4,7 @@
         "module": "esnext",
         "target": "esnext",
         "outDir": "../../public/scripts",
+        "allowJs": true
     },
     "include": [
         "**/*"

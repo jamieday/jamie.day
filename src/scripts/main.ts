@@ -1,6 +1,9 @@
-import { J$, escapeHtml, Markdown } from './util.js';
+import { J$, escapeHtml } from './util.js';
 import { LoginPayload } from './socket-payloads.js';
 import Blackboard from './blackboard.js';
+// import * as showdown from './modules/showdown/showdown.js';
+
+const markdownConverter = new showdown.Converter();
 
 export class WebSocketInfo {
   public socket: SocketIOClient.Socket;
@@ -151,7 +154,7 @@ const handleJmConsole = () => {
         description: "read how jamieday.ca works",
         run: async () => {
           const techInfoContent = document.createElement('div');
-          techInfoContent.innerHTML = Markdown.parse(await markdownFiles.techInfo.content).html();
+          techInfoContent.innerHTML = markdownConverter.makeHtml(await markdownFiles.techInfo.content);
 
           replaceContent(techInfoContent, true);
           resetConsole();
