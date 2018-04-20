@@ -10,3 +10,15 @@ export function escapeHtml(html: string) {
   div.appendChild(text);
   return div.innerHTML;
 }
+
+interface MarkdownParsed {
+  raw: string;
+  html: () => string;
+}
+
+export const Markdown = {
+  parse(markdown: string): MarkdownParsed {
+    markdown = 'Markdown parsing not implemented';
+    return { raw: markdown, html: () => markdown };
+  }
+}

@@ -1,4 +1,4 @@
-import { J$, escapeHtml } from './util.js';
+import { J$, escapeHtml, Markdown } from './util.js';
 import { LoginPayload } from './socket-payloads.js';
 import Blackboard from './blackboard.js';
 
@@ -58,6 +58,22 @@ for (let i=0; i<backgroundImages.length; i++) {
   let img = new Image();
   img.src = backgroundImages[i];
 }
+
+class MarkdownFile {
+  filename: string;
+  content: Promise<string>
+
+  constructor(filename: string) {
+    this.filename = filename;
+    this.content = (async () => (await fetch(filename)).text())();
+  }
+}
+
+// preload text
+const markdownFiles = {
+  techInfo: new MarkdownFile("/text/tech-info.md")
+};
+
 
 window.onload = () => {
   handleBgImages();
@@ -131,6 +147,16 @@ const handleJmConsole = () => {
           setInstructions(helpAvailableCmds);
         }
       },
+      "tech-info": {
+        description: "read how jamieday.ca works",
+        run: async () => {
+          const techInfoContent = document.createElement('div');
+          techInfoContent.innerHTML = Markdown.parse(await markdownFiles.techInfo.content).html();
+
+          replaceContent(techInfoContent, true);
+          resetConsole();
+        }
+      },
       "blackboard": {
         description: "toggle the online blackboard",
         run: () => {
@@ -147,7 +173,7 @@ const handleJmConsole = () => {
             const blackboard = new Blackboard(ws);
             blackboard.attachTo(blackboardContainer);
       
-            showContent(blackboardContainer, true);
+            replaceContent(blackboardContainer, true);
             resetConsole();
           }
         }
@@ -216,11 +242,12 @@ const handleJmConsole = () => {
     contentContainer.style.display = "none";
     contentContainer.innerHTML = '';
   }
-  function showContent(newElement: HTMLElement, autoScroll = false) {
+  function replaceContent(element: HTMLElement, autoScroll = false) {
     const contentContainer = getContentContainerElement();
     contentContainer.style.display = "flex";
+    contentContainer.innerHTML = '';
 
-    contentContainer.appendChild(newElement);
+    contentContainer.appendChild(element);
 
     if (autoScroll) {
       contentContainer.scrollIntoView({
@@ -228,7 +255,6 @@ const handleJmConsole = () => {
         block: "end",
       });
     }
-    resetConsole();
   }
 
   let computingCmd = false;

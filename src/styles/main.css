@@ -136,6 +136,9 @@ h1 {
   width: 100%;
   background-color: var(--main-bg-color);
 }
+.content-container > * {
+  width: 100%;
+}
 
 .blackboard {
   cursor: crosshair;
