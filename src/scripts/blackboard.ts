@@ -1,3 +1,4 @@
+import { WebSocketInfo } from './main.js';
 import { DrawingPayload } from './socket-payloads.js';
 
 const supportedColors = [
@@ -5,7 +6,7 @@ const supportedColors = [
 ];
 
 export default class Blackboard {
-  ws: any;
+  ws: WebSocketInfo;
 
   canvas: HTMLCanvasElement;
   canvasBuffer: HTMLCanvasElement;
@@ -15,10 +16,11 @@ export default class Blackboard {
 
   trashImage: HTMLImageElement;
 
-  colors: HTMLDivElement;
-  element: HTMLDivElement;
+  colors: HTMLElement;
 
-  constructor(ws: any) {
+  constructor(ws: WebSocketInfo) {
+    this.ws = ws;
+
     this.canvas = document.createElement("canvas");
     this.canvas.className = "blackboard";
     this.canvas.width = Math.floor(window.innerWidth)
@@ -39,17 +41,14 @@ export default class Blackboard {
       color.style.backgroundColor = supportedColor;
       this.colors.appendChild(color);
     }
-
-    this.element = document.createElement("div");
-    this.element.className = "blackboard-container";
-    this.element.style.opacity = "0";
-    this.element.style.animation = "fwade-in 1s ease 1s 1 forwards";
-    this.element.appendChild(this.canvas);
-    this.element.appendChild(this.colors);
-
-    this.ws = ws;
     this.registerEventListeners();
   }
+
+  attachTo(parentElement: Element) {
+    parentElement.appendChild(this.canvas);
+    parentElement.appendChild(this.colors);
+  }
+
   registerEventListeners() {
     let self = this;
     let clientData = {

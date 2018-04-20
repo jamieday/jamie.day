@@ -9,7 +9,7 @@
   <% include ../partials/nav.ejs %>
 
 <div class="content text-center">
-  <div class="bg-content">
+  <div class="home-content">
     <div class="jm-background-img"></div>
     <a href="/" class="icon-circular fade-in">
       <img src="/images/icon.png">
@@ -19,8 +19,10 @@
 
     <div id="jm-console" class="fade-in">
       <p id="jm-console-instructions"></p>
-      <span style="float: left;width: 15px">$</span><input type="text" id="jm-console-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <span style="float: left;width: 15px">></span><input type="text" id="jm-console-input" autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
+  </div>
+  <div class="content-container">
   </div>
 </div>
 <script src="/socket.io/socket.io.js"></script>

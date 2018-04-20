@@ -1,23 +1,29 @@
-declare function io(): any;
-
 import { J$, escapeHtml } from './util.js';
 import { LoginPayload } from './socket-payloads.js';
 import Blackboard from './blackboard.js';
 
-const ws = {
-  socket: io(),
-  _totalOnline: 0,
+export class WebSocketInfo {
+  public socket: SocketIOClient.Socket;
+  private _totalOnline: number;
+  
+  constructor(socket: SocketIOClient.Socket) {
+    this.socket = socket;
+    this._totalOnline = 0;
+  }
+
   set totalOnline(value) {
     this._totalOnline = value;
 
     const countElement = <HTMLElement> J$(".online-count");
     countElement.style.visibility = "visible";
     countElement.innerHTML = `${escapeHtml(ws.totalOnline.toString())} <span style="color:#BDBDBD">online</span>`;
-  },
+  }
   get totalOnline() {
     return this._totalOnline;
   }
-};
+}
+
+const ws = new WebSocketInfo(io());
 
 ws.socket.on('login', onLogin);
 ws.socket.on('logout', onLogout);
@@ -32,12 +38,6 @@ function onLogout(data: LoginPayload) {
 
 const getBackgroundImageElement = () => <HTMLElement> document.getElementsByClassName("jm-background-img")[0];
 
-const updateBgImgHeight = () => {
-  getBackgroundImageElement().style.height =
-    `${(<HTMLElement> document.getElementsByClassName("bg-content")[0]).offsetHeight + 70}px`;
-};
-
-setTimeout(updateBgImgHeight, 1000);
 function shuffle<T>(a: T[]) {
     for (let i = a.length; i; i--) {
         let j = Math.floor(Math.random() * i);
@@ -69,7 +69,6 @@ let changeBg: () => void;
 const handleBgImages = () => {
   const bgElement = getBackgroundImageElement();
   let bgIndex = 0;
-  bgElement.style.transition = "background-image 1s";
   changeBg = () => {
     bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++ % backgroundImages.length]}')`;
   }
@@ -133,7 +132,7 @@ const handleJmConsole = () => {
         }
       },
       "blackboard": {
-        description: "show/hide the blackboard",
+        description: "toggle the online blackboard",
         run: () => {
           toggleBlackboard(true);
         }
@@ -158,11 +157,11 @@ const handleJmConsole = () => {
         }
       },
       "exit": {
-        description: "get me outta here",
+        description: "reset console",
         run: () => {
           resetConsole();
         },
-        aliases: ["logout"]
+        aliases: ["logout", "reset"]
       }
     };
     for (const key in commands) {
@@ -193,16 +192,23 @@ const handleJmConsole = () => {
   }
   resetConsole();
   const toggleBlackboard = (scrollTo = false) => {
-    const contentElement = document.getElementsByClassName("content")[0];
+    const contentContainer = <HTMLElement> document.getElementsByClassName("content-container")[0];
     const blackboardContainer = document.getElementsByClassName("blackboard-container");
     if (blackboardContainer.length) {
-      contentElement.removeChild(blackboardContainer[0]);
-      setInstructions("Board of that.");
+      contentContainer.style.display = "none";
+      contentContainer.removeChild(blackboardContainer[0]);
+      setInstructions("Board of that! Type `help` for more.");
     } else {
+      contentContainer.style.display = "flex";
+      const blackboardContainer = document.createElement("div");
+      blackboardContainer.className = 'blackboard-container';
+
       const blackboard = new Blackboard(ws);
-      contentElement.appendChild(blackboard.element);
+      blackboard.attachTo(blackboardContainer);
+
+      contentContainer.appendChild(blackboardContainer);
       if (scrollTo) {
-        blackboard.element.scrollIntoView({
+        contentContainer.scrollIntoView({
           behavior: "smooth",
           block: "end",
         });
@@ -210,7 +216,6 @@ const handleJmConsole = () => {
       resetConsole();
     }
   };
-  setTimeout(toggleBlackboard, 1000); // todo onFadeInComplete()
   let computingCmd = false;
   let processCmd = async (cmd: string) => {
     clearConsole();
@@ -232,7 +237,6 @@ const handleJmConsole = () => {
         processCmdLoggedIn(cmd);
         break;
     }
-    updateBgImgHeight();
   };
 
   // Add key events for handling input
