@@ -208,6 +208,7 @@ const handleJmConsole = () => {
       "exit": {
         description: "reset console",
         run: () => {
+          collapseContent();
           resetConsole();
         },
         aliases: ["logout", "reset"]
