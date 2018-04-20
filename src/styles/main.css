@@ -1,5 +1,9 @@
 :root {
   --main-bg-color: #242424; 
+  --material-grey-900: #212121;
+  --pre-color: #a9a9a9;
+  --code-color: #ef5350;
+  --md-color: #dadada;
 }
 
 body {
@@ -55,7 +59,7 @@ body::-webkit-scrollbar-thumb
   width: 100%;
   height: 100%;
   content: '';
-  background-color: #212121; /* material grey 900 */
+  background-color: var(--material-grey-900);
   animation: translucinate 2s ease 1s 1 forwards; /* todo variables for these #s */
 }
 h1 {
@@ -138,6 +142,29 @@ h1 {
 }
 .content-container > * {
   width: 100%;
+}
+
+.markdown-content {
+  opacity: 0;
+  transition: opacity 1s ease 300ms;
+
+  padding: 0 100px;
+  text-align: left;
+  color: var(--md-color);
+}
+.markdown-content p {
+  font-size: 12px;
+}
+.markdown-content pre {
+  background-color: var(--material-grey-900);
+  color: var(--pre-color);
+}
+.markdown-content pre > code {
+  color: var(--pre-color);
+}
+.markdown-content code {
+  color: var(--code-color);
+  background-color: transparent;
 }
 
 .blackboard {

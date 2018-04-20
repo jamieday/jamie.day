@@ -1,7 +1,9 @@
+declare const showdown: { Converter: Showdown.ConverterStatic };
+
 import { J$, escapeHtml } from './util.js';
 import { LoginPayload } from './socket-payloads.js';
 import Blackboard from './blackboard.js';
-// import * as showdown from './modules/showdown/showdown.js';
+import { Showdown } from './modules/showdown/showdown.js';
 
 const markdownConverter = new showdown.Converter();
 
@@ -154,9 +156,12 @@ const handleJmConsole = () => {
         description: "read how jamieday.ca works",
         run: async () => {
           const techInfoContent = document.createElement('div');
+          techInfoContent.className = 'markdown-content';
           techInfoContent.innerHTML = markdownConverter.makeHtml(await markdownFiles.techInfo.content);
-
-          replaceContent(techInfoContent, true);
+          
+          replaceContent(techInfoContent);
+          techInfoContent.style.opacity = '1';
+          
           resetConsole();
         }
       },
@@ -176,7 +181,7 @@ const handleJmConsole = () => {
             const blackboard = new Blackboard(ws);
             blackboard.attachTo(blackboardContainer);
       
-            replaceContent(blackboardContainer, true);
+            replaceContent(blackboardContainer);
             resetConsole();
           }
         }
@@ -245,14 +250,14 @@ const handleJmConsole = () => {
     contentContainer.style.display = "none";
     contentContainer.innerHTML = '';
   }
-  function replaceContent(element: HTMLElement, autoScroll = false) {
+  function replaceContent(element: HTMLElement, autoscroll = true) {
     const contentContainer = getContentContainerElement();
     contentContainer.style.display = "flex";
     contentContainer.innerHTML = '';
 
     contentContainer.appendChild(element);
 
-    if (autoScroll) {
+    if (autoscroll) {
       contentContainer.scrollIntoView({
         behavior: "smooth",
         block: "end",

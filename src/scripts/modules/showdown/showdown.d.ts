@@ -3,10 +3,9 @@
 // Definitions by: cbowdon <https://github.com/cbowdon>, Pei-Tang Huang <https://github.com/tan9>, Ariel-Saldana <https://github.com/arielsaldana>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-export = Showdown;
 export as namespace showdown;
 
-declare namespace Showdown {
+export declare namespace Showdown {
 
     interface Extension {
         /**
