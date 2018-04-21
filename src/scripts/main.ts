@@ -132,7 +132,7 @@ const handleJmConsole = () => {
     aliases?: string[];
   }
 
-  let processCmdLoggedIn = (cmd: string) => {
+  const processCmdLoggedIn = (cmd: string) => {
     const commands: { [index:string] : Command } = {
       "help": {
         description: "list all available commands",
@@ -157,6 +157,7 @@ const handleJmConsole = () => {
         run: () => {
           window.open('/resume.pdf', '_blank');
         },
+        aliases: ["cv"]
       },
       "tech-info": {
         description: "read how jamieday.ca works",
@@ -211,6 +212,12 @@ const handleJmConsole = () => {
           window.open('https://github.com/jday370/', '_blank');
         }
       },
+      "clear": {
+        description: "clear command history",
+        run: () => {
+          commandHistory.clear();
+        },
+      },
       "exit": {
         description: "reset console",
         run: () => {
@@ -224,15 +231,16 @@ const handleJmConsole = () => {
       const command = commands[key];
       if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
         commands[key].run();
-        return;
-      } else if (cmd.toLowerCase() == key.toLowerCase()) {
+        return true;
+      } else if (cmd.toLowerCase() == key.toLowerCase() || (command.aliases && command.aliases.map(s => s.toLowerCase()).indexOf(cmd.toLowerCase()) !== -1)) {
         setInstructions(`all lowercase please, this is a shift-unfriendly console..
-          <br>"${cmd}" -> "${key}"`);
-        return;
+          <br>\`${cmd}\` -> \`${cmd.toLowerCase()}\``);
+        return false;
       }
     }
     setInstructions(`\`${cmd}\` is not a recognized command 😢
       <br>If you want a list of available commands, try \`help\``);
+    return false;
   };
 
   async function sleep(ms: number) {
@@ -267,15 +275,76 @@ const handleJmConsole = () => {
     if (autoscroll) {
       contentContainer.scrollIntoView({
         behavior: "smooth",
-        block: "end",
+        block: "start",
       });
     }
   }
 
-  let computingCmd = false;
-  let processCmd = async (cmd: string) => {
+  class CommandHistory { 
+    private static readonly historyStorageKey: string = 'JD_HISTORY_STORAGE';
+
+    private readonly storage: Storage;
+
+    private history: string[]; 
+    private pointer: number = 0;
+
+    constructor(storage: Storage) {
+      this.storage = storage;
+      this.history = this.load();
+      this.pointer = this.history.length;
+    }
+
+    private load() {
+      const existingHistoryJson = this.storage.getItem(CommandHistory.historyStorageKey);
+      if (existingHistoryJson === null) {
+        return [];
+      }
+      return <string[]> JSON.parse(existingHistoryJson);
+    }
+
+    save() {
+      this.storage.setItem(CommandHistory.historyStorageKey, JSON.stringify(this.history));
+    }
+
+    get currentEntry() {
+      if (this.pointer < 0 || this.pointer >= this.history.length) return null;
+      return this.history[this.pointer];
+    }
+
+    addEntry(entry: string) {
+      this.history.push(entry);
+      this.pointer = this.history.length; // keep pointer after history
+    }
+
+    clear() {
+      this.history = [];
+      this.pointer = 0;
+      this.save();
+    }
+
+    moveUp(currentInput: string) {
+      if (this.history.length === 0) {
+        this.addEntry(currentInput);
+      }
+      if (this.pointer > 0)
+        this.pointer--;
+      return this.currentEntry;
+    }
+
+    moveDown(currentInput: string) {
+      if (this.pointer > this.history.length - 1)
+        return currentInput;
+      
+      this.pointer++;
+      return this.currentEntry;
+    }
+  }
+
+  const commandHistory = new CommandHistory(localStorage);
+  
+  const processCmd = async (cmd: string) => {
     clearConsole();
-    if (!cmd) return;
+    if (!cmd.trim()) return;
     switch (state) {
       case INIT:
         if (cmd === "CORRECT_PASSWORD") {
@@ -290,6 +359,8 @@ const handleJmConsole = () => {
         }
         break;
       case LOGGED_IN:
+        commandHistory.addEntry(cmd);
+        commandHistory.save();
         processCmdLoggedIn(cmd);
         break;
     }
@@ -298,9 +369,24 @@ const handleJmConsole = () => {
   // Add key events for handling input
   consoleElement.onkeypress = e => {
     e = e || window.event;
-    let keyCode = e.keyCode || e.which;
-    if (keyCode == 13) {
+    const keyCode = e.keyCode || e.which;
+
+    if (keyCode == 13) { // press enter
       processCmd(escapeHtml(consoleElement.value));
+      return false;
+    }
+  };
+
+  consoleElement.onkeydown = e => {
+    e = e || window.event;
+    const keyCode = e.keyCode || e.which;
+
+    if (keyCode == 38) { // press up arrow
+      consoleElement.value = commandHistory.moveUp(consoleElement.value) || '';
+      return false;
+    }
+    if (keyCode == 40) { // press down arrow
+      consoleElement.value = commandHistory.moveDown(consoleElement.value) || '';
       return false;
     }
   };
