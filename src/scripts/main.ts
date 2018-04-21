@@ -152,6 +152,12 @@ const handleJmConsole = () => {
           setInstructions(helpAvailableCmds);
         }
       },
+      "resume": {
+        description: "open my resume",
+        run: () => {
+          window.open('/resume.pdf', '_blank');
+        },
+      },
       "tech-info": {
         description: "read how jamieday.ca works",
         run: async () => {
