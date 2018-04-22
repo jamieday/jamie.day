@@ -227,21 +227,41 @@ const handleJmConsole = () => {
         aliases: ["logout", "reset"]
       }
     };
-    for (const key in commands) {
-      const command = commands[key];
-      if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
-        commands[key].run();
-        return true;
-      } else if (cmd.toLowerCase() == key.toLowerCase() || (command.aliases && command.aliases.map(s => s.toLowerCase()).indexOf(cmd.toLowerCase()) !== -1)) {
-        setInstructions(`all lowercase please, this is a shift-unfriendly console..
-          <br>\`${cmd}\` -> \`${cmd.toLowerCase()}\``);
-        return false;
-      }
+    enum CommandError {
+      UsedShift,
+      UnrecognizedCommand
     }
-    setInstructions(`\`${cmd}\` is not a recognized command 😢
-      <br>If you want a list of available commands, try \`help\``);
-    return false;
+    function findCommand(cmd: string) {
+      if (commands.hasOwnProperty(cmd)) {
+        return commands[cmd];
+      }
+      for (const key in commands) {
+        const command = commands[key];
+        if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
+          return command;
+        } else if (cmd.toLowerCase() == key.toLowerCase() || (command.aliases && command.aliases.map(s => s.toLowerCase()).indexOf(cmd.toLowerCase()) !== -1)) {
+          return CommandError.UsedShift;
+        }
+      }
+      return CommandError.UnrecognizedCommand;
+    }
+
+    const commandResult = findCommand(cmd);
+    
+    if (typeof commandResult === "object") {
+      commandResult.run();
+      return true;
+    } else {
+      const errMessage = commandResult === CommandError.UsedShift
+        ? `all lowercase please, this is a shift-unfriendly console..
+        <br>\`${cmd}\` -> \`${cmd.toLowerCase()}\``
+        : `\`${cmd}\` is not a recognized command 😢
+        <br>If you want a list of available commands, try \`help\``;
+      setInstructions(errMessage);
+      return false;
+    }
   };
+
 
   async function sleep(ms: number) {
     await new Promise((resolve) => setTimeout(resolve, ms));
