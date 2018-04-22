@@ -78,8 +78,6 @@ export default class Blackboard {
 
       let titleX = self.canvas.width / 2, titleY = 0;
       self.ctx.fillText("Interactive Online Blackboard", titleX, titleY);
-      drawArrow(titleX-133, titleY+3);
-      drawArrow(titleX+133, titleY+3);
     }
     function redrawTrashComponent() {
       // self.ctx.drawImage(self.trashImage, 20, 20, 40, 40);
@@ -102,10 +100,10 @@ export default class Blackboard {
 
     let drawing = false;
 
-    self.canvas.addEventListener('mousedown', onMouseDown);
-    self.canvas.addEventListener('mouseup', onMouseUp);
-    self.canvas.addEventListener('mouseout', onMouseUp);
-    self.canvas.addEventListener('mousemove', throttled(onMouseMove, 10));
+    self.canvas.addEventListener('pointerdown', onPointerDown);
+    self.canvas.addEventListener('pointerup', onPointerUp);
+    self.canvas.addEventListener('pointerout', onPointerUp);
+    self.canvas.addEventListener('pointermove', onPointerMove);
 
     for (let i=0; i<self.colors.children.length; i++) {
       self.colors.children[i].addEventListener('click', onColorUpdate);
@@ -135,32 +133,51 @@ export default class Blackboard {
       }
     }
 
-    function onMouseDown(e: MouseEvent) {
-      e.preventDefault();
+    // limit the number of events per second
+    function throttler<T>(delay: number) {
+      let previousCall = 0;
+      return (result: () => T, orElse?: () => T) => {
+        let time = new Date().getTime();
+
+        if ((time - previousCall) >= delay) {
+          previousCall = time;
+          return result();
+        }
+        return typeof orElse === 'undefined'
+          ? undefined
+          : orElse();
+      };
+    }
+
+    const canEmitThrottler = throttler<boolean>(10);
+    const canEmitDrawingEvent = () => <boolean> canEmitThrottler(() => true, () => false);
+
+    function onPointerDown(e: PointerEvent) {
       // deselect any text etc
       window.getSelection().removeAllRanges();
+
       drawing = true;
       clientData.currentPos.x = e.clientX;
       clientData.currentPos.y = e.clientY;
       let canvasRect = self.canvas.getBoundingClientRect();
       drawLine(e.clientX - canvasRect.left, e.clientY - canvasRect.top,
-        e.clientX - canvasRect.left, e.clientY - canvasRect.top - 1, clientData.selectedColor, true);
+        e.clientX - canvasRect.left, e.clientY - canvasRect.top - 1, clientData.selectedColor, canEmitDrawingEvent());
     }
 
-    function onMouseUp(e: MouseEvent) {
+    function onPointerUp(e: PointerEvent) {
       if (drawing) {
         drawing = false;
-        let canvasRect = self.canvas.getBoundingClientRect();
+        const canvasRect = self.canvas.getBoundingClientRect();
         drawLine(clientData.currentPos.x - canvasRect.left, clientData.currentPos.y - canvasRect.top,
-           e.clientX - canvasRect.left, e.clientY - canvasRect.top, clientData.selectedColor, true);
+           e.clientX - canvasRect.left, e.clientY - canvasRect.top, clientData.selectedColor, canEmitDrawingEvent());
       }
     }
 
-    function onMouseMove(e: MouseEvent) {
+    function onPointerMove(e: PointerEvent) {
       if (drawing) {
-        let canvasRect = self.canvas.getBoundingClientRect();
+        const canvasRect = self.canvas.getBoundingClientRect();
         drawLine(clientData.currentPos.x - canvasRect.left, clientData.currentPos.y - canvasRect.top,
-           e.clientX - canvasRect.left, e.clientY - canvasRect.top, clientData.selectedColor, true);
+           e.clientX - canvasRect.left, e.clientY - canvasRect.top, clientData.selectedColor, canEmitDrawingEvent());
         clientData.currentPos.x = e.clientX;
         clientData.currentPos.y = e.clientY;
       }
@@ -168,19 +185,6 @@ export default class Blackboard {
 
     function onColorUpdate(e: Event) {
       setCurrentColorByElement(<HTMLElement> e.target);
-    }
-
-    // limit the number of events per second
-    function throttled(callback: Function, delay: number) {
-      let previousCall = new Date().getTime();
-      return (...args: any[]) => {
-        let time = new Date().getTime();
-
-        if ((time - previousCall) >= delay) {
-          previousCall = time;
-          callback.apply(null, args);
-        }
-      };
     }
 
     function onDrawingEvent(data: DrawingPayload) {

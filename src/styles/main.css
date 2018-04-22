@@ -169,6 +169,7 @@ h1 {
 
 .blackboard {
   cursor: crosshair;
+  touch-action: pinch-zoom;
   user-select: none;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
