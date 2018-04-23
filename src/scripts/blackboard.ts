@@ -150,7 +150,7 @@ export default class Blackboard {
     }
 
     const canEmitThrottler = throttler<boolean>(10);
-    const canEmitDrawingEvent = () => <boolean> canEmitThrottler(() => true, () => false);
+    const canEmitDrawingEvent = () => true;//() => <boolean> canEmitThrottler(() => true, () => false);
 
     function onPointerDown(e: PointerEvent) {
       // deselect any text etc
