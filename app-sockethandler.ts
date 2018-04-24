@@ -1,4 +1,4 @@
-import { SocketEvent, DrawingPayload, FloatingMsg, LoginPayload } from './src/scripts/shared/socket-payloads';
+import { SocketEvent, Drawing, FloatingMsg, Login } from './src/scripts/shared/socket-payloads';
 
 export default class SocketHandler {
   io: SocketIO.Server;
@@ -18,7 +18,7 @@ export default class SocketHandler {
     this.io.sockets.on('connection', this.onConnection.bind(this));
   }
   onDraw(socket: SocketIO.Socket) {
-    return (data: DrawingPayload) => {
+    return (data: Drawing.Payload) => {
       socket.broadcast.emit(SocketEvent.Drawing, data);
     }
   }
@@ -29,7 +29,7 @@ export default class SocketHandler {
   }
   async onConnection(socket: SocketIO.Socket) {
     console.log(`User connected: ${socket.id}`);
-    this.io.sockets.emit(SocketEvent.Login, new LoginPayload(await this.getTotalOnline()));
+    this.io.sockets.emit(SocketEvent.Login, new Login.Payload(await this.getTotalOnline()));
     socket.on('disconnect', this.onDisconnect(socket).bind(this));
     socket.on(SocketEvent.Drawing, this.onDraw(socket));
     socket.on(SocketEvent.FloatingMsg, this.onFloatingMsg(socket));
@@ -37,7 +37,7 @@ export default class SocketHandler {
   onDisconnect(socket: SocketIO.Socket) {
     return async () => {
       console.log(`User disconnected: ${socket.id}`);
-      socket.broadcast.emit(SocketEvent.Logout, new LoginPayload(await this.getTotalOnline()));
+      socket.broadcast.emit(SocketEvent.Logout, new Login.Payload(await this.getTotalOnline()));
     }
   }
 }

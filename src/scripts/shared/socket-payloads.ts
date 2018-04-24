@@ -5,28 +5,37 @@ export enum SocketEvent {
   FloatingMsg = 'floating-msg'
 }
 
-export class LoginPayload {
-  totalOnline: number;
+export namespace Login {
+  export class Payload {
+    totalOnline: number;
 
-  constructor(totalOnline: number) {
-    this.totalOnline = totalOnline;
+    constructor(totalOnline: number) {
+      this.totalOnline = totalOnline;
+    }
   }
 }
 
-export class DrawingPayload {
-  x0: number;
-  y0: number;
-  x1: number;
-  y1: number;
-  color: string;
+export namespace Drawing {
+  export class Payload {
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+    color: string;
 
-  constructor(x0: number, y0: number, x1: number, y1: number, color: string) {
-    this.x0 = x0;
-    this.y0 = y0;
-    this.x1 = x1;
-    this.y1 = y1;
-    this.color = color;
+    constructor(x0: number, y0: number, x1: number, y1: number, color: string) {
+      this.x0 = x0;
+      this.y0 = y0;
+      this.x1 = x1;
+      this.y1 = y1;
+      this.color = color;
+    }
   }
+}
+
+// todo move to util
+function randomBetween(min: number, max: number) {
+  return min + Math.random() * (max-min);
 }
 
 export namespace FloatingMsg {
@@ -36,8 +45,18 @@ export namespace FloatingMsg {
     right: string | null
   }
 
-  export class Position {
-    static Random() {
+  export class Payload {
+    message: string;
+    fontSize: string;
+    position: Position;
+  
+    constructor(message: string, fontSize: string, position: Position) {
+      this.message = message;
+      this.fontSize = fontSize;
+      this.position = position;
+    }
+
+    static Generate(message: string) {
       const position: Position = <Position> {
         top: `${Math.random()*100}%`
       };
@@ -47,17 +66,7 @@ export namespace FloatingMsg {
       else 
         position.right = `${Math.random()*70}px`;
   
-      return position;
-    }
-  }
-
-  export class Payload {
-    message: string;
-    position: Position;
-  
-    constructor(message: string, position: Position) {
-      this.message = message;
-      this.position = position;
+      return new Payload(message, `${randomBetween(8, 24)}px`, position);
     }
   }
 }

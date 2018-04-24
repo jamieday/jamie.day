@@ -301,18 +301,14 @@ const handleJmConsole = () => {
   }
 
   ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsg.Payload) => {
-    addFloatingMessage(data.message, data.position);
+    addFloatingMessage(data);
   });
 
   function onCommandEntered(cmd: string) {
-    addFloatingMessage(cmd, FloatingMsg.Position.Random(), true);
+    addFloatingMessage(FloatingMsg.Payload.Generate(cmd), true);
   }
 
-  function randomBetween(min: number, max: number) {
-    return min + Math.random() * (max-min);
-  }
-
-  function addFloatingMessage(text: string, position: FloatingMsg.Position, emit = false) {
+  function addFloatingMessage(payload: FloatingMsg.Payload, emit = false) {
     let commandContainer = document.getElementById('floating-msg-container');
     if (commandContainer === null) {
       commandContainer = document.createElement('div');
@@ -321,15 +317,15 @@ const handleJmConsole = () => {
     } 
 
     const commandIndicator = document.createElement('div');
-    commandIndicator.className = `floating-msg ${text}`;
-    commandIndicator.textContent = text;
+    commandIndicator.className = `floating-msg ${payload.message}`;
+    commandIndicator.textContent = payload.message;
 
-    // to pop out then shrink after
+    // initial size to pop out then shrink after
     commandIndicator.style.fontSize = '36px';
     
-    commandIndicator.style.top = position.top;
-    commandIndicator.style.left = position.left;
-    commandIndicator.style.right = position.right;
+    commandIndicator.style.top = payload.position.top;
+    commandIndicator.style.left = payload.position.left;
+    commandIndicator.style.right = payload.position.right;
 
     commandIndicator.addEventListener('transitionend', evt => {
       if ((<TransitionEvent> evt).propertyName == 'opacity') {
@@ -341,18 +337,11 @@ const handleJmConsole = () => {
     // see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions#JavaScript_examples
     setTimeout(() => {
       commandIndicator.style.opacity = '0';
-      commandIndicator.style.fontSize = `${randomBetween(8, 24)}px`;
+      commandIndicator.style.fontSize = payload.fontSize;
     }, 50);
 
     if (emit) {
-      ws.socket.emit(SocketEvent.FloatingMsg, new FloatingMsg.Payload(
-        text,
-        {
-          top: commandIndicator.style.top,
-          left: commandIndicator.style.left,
-          right: commandIndicator.style.right
-        }
-      ));
+      ws.socket.emit(SocketEvent.FloatingMsg, payload);
     }
   }
 
