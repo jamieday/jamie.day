@@ -1,7 +1,7 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
 import { J$, escapeHtml } from './util.js';
-import { LoginPayload } from './socket-payloads.js';
+import { SocketEvent, LoginPayload, FloatingMsgPayload } from './socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
@@ -30,8 +30,8 @@ export class WebSocketInfo {
 
 const ws = new WebSocketInfo(io());
 
-ws.socket.on('login', onLogin);
-ws.socket.on('logout', onLogout);
+ws.socket.on(SocketEvent.Login, onLogin);
+ws.socket.on(SocketEvent.Logout, onLogout);
 
 function onLogin(data: LoginPayload) {
   ws.totalOnline = data.totalOnline;
@@ -300,6 +300,57 @@ const handleJmConsole = () => {
     }
   }
 
+  ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsgPayload) => {
+    addFloatingMessage(data.message);
+  });
+
+  function onCommandEntered(cmd: string) {
+    addFloatingMessage(cmd, true);
+  }
+
+  function randomBetween(min: number, max: number) {
+    return min + Math.random() * (max-min);
+  }
+
+  function addFloatingMessage(text: string, emit = false) {
+    let commandContainer = document.getElementById('floating-msg-container');
+    if (commandContainer === null) {
+      commandContainer = document.createElement('div');
+      commandContainer.id = 'floating-msg-container';
+      document.body.appendChild(commandContainer);
+    } 
+
+    const commandIndicator = document.createElement('div');
+    commandIndicator.className = `floating-msg ${text}`;
+    commandIndicator.textContent = text;
+
+    // to pop out then shrink after
+    commandIndicator.style.fontSize = '36px';
+    
+    commandIndicator.style.top = `${Math.random()*100}%`;
+    if (Math.random() > 0.5) 
+      commandIndicator.style.left = `${Math.random()*70}px`;
+    else 
+      commandIndicator.style.right = `${Math.random()*70}px`;
+
+    commandIndicator.addEventListener('transitionend', evt => {
+      if ((<TransitionEvent> evt).propertyName == 'opacity') {
+        (<HTMLElement> commandContainer).removeChild(commandIndicator);
+      }
+    });
+    commandContainer.appendChild(commandIndicator);
+
+    // see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions#JavaScript_examples
+    setTimeout(() => {
+      commandIndicator.style.opacity = '0';
+      commandIndicator.style.fontSize = `${randomBetween(8, 24)}px`;
+    }, 50);
+
+    if (emit) {
+      ws.socket.emit(SocketEvent.FloatingMsg, new FloatingMsgPayload(text));
+    }
+  }
+
   class CommandHistory { 
     private static readonly historyStorageKey: string = 'JD_HISTORY_STORAGE';
 
@@ -381,6 +432,9 @@ const handleJmConsole = () => {
       case LOGGED_IN:
         commandHistory.addEntry(cmd);
         commandHistory.save();
+
+        onCommandEntered(cmd);
+
         processCmdLoggedIn(cmd);
         break;
     }

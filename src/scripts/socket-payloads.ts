@@ -1,3 +1,10 @@
+export enum SocketEvent {
+  Login = 'login',
+  Logout = 'logout',
+  Drawing = 'drawing',
+  FloatingMsg = 'floating-msg'
+}
+
 export class LoginPayload {
   totalOnline: number;
 
@@ -19,5 +26,13 @@ export class DrawingPayload {
     this.x1 = x1;
     this.y1 = y1;
     this.color = color;
+  }
+}
+
+export class FloatingMsgPayload {
+  message: string;
+
+  constructor(message: string) {
+    this.message = message;
   }
 }

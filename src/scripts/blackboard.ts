@@ -1,5 +1,5 @@
 import { WebSocketInfo } from './main.js';
-import { DrawingPayload } from './socket-payloads.js';
+import { SocketEvent, DrawingPayload } from './socket-payloads.js';
 
 const supportedColors = [
   "#E0E0E0", "#f44336", "#4CAF50", "#2196F3", "#FFEB3B  ", "#E91E63"
@@ -110,7 +110,7 @@ export default class Blackboard {
     }
     setCurrentColorByElement(<HTMLElement> self.colors.children[0]);
 
-    self.ws.socket.on('drawing', onDrawingEvent);
+    self.ws.socket.on(SocketEvent.Drawing, onDrawingEvent);
 
     function drawLineInCtx(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, color: string) {
       ctx.beginPath();
@@ -129,7 +129,7 @@ export default class Blackboard {
         let w = self.canvas.width;
         let h = self.canvas.height;
 
-        self.ws.socket.emit('drawing', new DrawingPayload(x0 / w, y0 / h, x1 / w, y1 / h, color));
+        self.ws.socket.emit(SocketEvent.Drawing, new DrawingPayload(x0 / w, y0 / h, x1 / w, y1 / h, color));
       }
     }
 

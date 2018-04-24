@@ -18,11 +18,17 @@ class SocketHandler {
       socket.broadcast.emit('drawing', data);
     }
   }
+  onFloatingMsg(socket) {
+    return data => {
+      socket.broadcast.emit('floating-msg', data);
+    }
+  }
   async onConnection(socket) {
     console.log(`User connected: ${socket.id}`);
     this.io.sockets.emit('login', {totalOnline: await this.getTotalOnline()});
     socket.on('disconnect', this.onDisconnect(socket).bind(this));
     socket.on('drawing', this.onDraw(socket));
+    socket.on('floating-msg', this.onFloatingMsg(socket));
   }
   onDisconnect(socket) {
     return async () => {
