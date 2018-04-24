@@ -1,7 +1,7 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
 import { J$, escapeHtml } from './util.js';
-import { SocketEvent, LoginPayload, FloatingMsgPayload } from './socket-payloads.js';
+import { SocketEvent, LoginPayload, FloatingMsgPayload } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 

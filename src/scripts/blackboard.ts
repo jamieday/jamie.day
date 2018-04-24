@@ -1,5 +1,5 @@
 import { WebSocketInfo } from './main.js';
-import { SocketEvent, DrawingPayload } from './socket-payloads.js';
+import { SocketEvent, DrawingPayload } from './shared/socket-payloads.js';
 
 const supportedColors = [
   "#E0E0E0", "#f44336", "#4CAF50", "#2196F3", "#FFEB3B  ", "#E91E63"

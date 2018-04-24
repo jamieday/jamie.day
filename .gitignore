@@ -1,7 +1,8 @@
 # Custom
 public/styles/
 public/scripts/
-built/
+**/*.js
+**/*.js.map
 
 # Logs
 logs

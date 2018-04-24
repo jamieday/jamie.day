@@ -1,15 +1,20 @@
-const path = require('path');
-const express = require('express');
-const fs = require('fs');
-const app = express();
-const server = require('http').createServer(app);
-const favicon = require('serve-favicon');
-const io = require('socket.io')(server);
-const socketHandler = require('./app-sockethandler').createHandler(io);
-const exec = require('child_process').exec;
-const config = require('./config');
-const port = process.env.PORT || 5050
+import * as path from 'path';
+import * as express from 'express';
+import { createServer } from 'http';
+import * as favicon from 'serve-favicon';
+import * as socketIO from 'socket.io';
+import SocketHandler from './app-sockethandler';
+import { exec } from 'child_process';
+import config from './config';
 
+const app = express();
+const server = createServer(app);
+const io = socketIO(server);
+const socketHandler = new SocketHandler(io);
+
+const port = process.env.PORT 
+  ? parseInt(process.env.PORT)
+  : 5050
 const env = process.env.ENVIRONMENT || (() => {
   console.warn('Warning: No environment specified, defaulting to DEV');
   return 'DEV';
@@ -29,11 +34,7 @@ if (skipCssPipeline) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-/**
- * Shuffles array in place. ES6 version
- * @param {Array} a items The array containing the items.
- */
-function shuffle(a) {
+function shuffle(a: any[]) {
     for (let i = a.length; i; i--) {
         let j = Math.floor(Math.random() * i);
         [a[i - 1], a[j]] = [a[j], a[i - 1]];
@@ -41,31 +42,12 @@ function shuffle(a) {
     return a;
 }
 
-app.get('/', function(req, res) {
-  let websiteWords = [
-    "Website", "Site", "This website", "This site"
-  ];
-  let currentlyWords = [
-    "currently", "actively", "seriously"
-  ];
-  let prepositionWords = [
-    "under", "in", "undergoing"
-  ];
-  let constructionWords = [
-    "construction", "development"
-  ];
-  let randomElement = arr => arr[Math.floor(Math.random() * arr.length)];
-  let phrase = {
-    websiteWord: randomElement(websiteWords),
-    currentlyWord: randomElement(currentlyWords),
-    prepositionWord: randomElement(prepositionWords),
-    constructionWord: randomElement(constructionWords)
-  };
-  res.render('pages/index', { phrase: phrase });
+app.get('/', (_, res) => {
+  res.render('pages/index');
 });
 
-async function executeCommand(cmd) {
-  return new Promise((resolve, reject) => {
+async function executeCommand(cmd: string) {
+  return <Promise<{stdout: string, stderr: string}>> new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
         if (error) reject(error);
         resolve({stdout: stdout, stderr: stderr});
@@ -73,7 +55,7 @@ async function executeCommand(cmd) {
   });
 }
 
-async function executePipeline(command) {
+async function executePipeline(command: string) {
   try {
     let output = await executeCommand(command);
     if (output.stdout) console.log(output.stdout);
@@ -92,7 +74,7 @@ async function executeCssPipeline() {
   await executePipeline("mkdir -p public/styles && node_modules/.bin/postcss src/styles/main.css --use autoprefixer | node_modules/.bin/cssmin >public/styles/main.css");
 };
 
-async function listen(port) {
+async function listen(port: number) {
   return new Promise(resolve => {
     // listen for socket connections
     socketHandler.registerListeners();
