@@ -1,9 +1,6 @@
 # Todo List
 
 ## Features
-- Simple websocket command log
-  - Command entered =>
-    display randomly on page (slight random rotate, maybe initial pulse) and then fade out for any user entering commands
 - Blackboard
   - Persistence
   - Clear blackboard button allowing people to decline the clear if they say so within 10 seconds (like league surrender vote)
@@ -30,6 +27,5 @@ Can you type that again please?
 
 ## Architecture
 
-- TypeScript backend
 - Command event-sourcing (history)
 - Command modularization
