@@ -100,7 +100,7 @@ h1 {
   position: fixed;
   opacity: 1;
   color: rgba(255, 255, 255, 0.2);
-  transition: opacity 160s, font-size 500ms;
+  transition: opacity 220s, font-size 500ms;
 }
 .fade-in {
   opacity: 0;

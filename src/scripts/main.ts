@@ -1,7 +1,7 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
 import { J$, escapeHtml } from './util.js';
-import { SocketEvent, LoginPayload, FloatingMsgPayload } from './shared/socket-payloads.js';
+import { SocketEvent, LoginPayload, FloatingMsg } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
@@ -300,19 +300,19 @@ const handleJmConsole = () => {
     }
   }
 
-  ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsgPayload) => {
-    addFloatingMessage(data.message);
+  ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsg.Payload) => {
+    addFloatingMessage(data.message, data.position);
   });
 
   function onCommandEntered(cmd: string) {
-    addFloatingMessage(cmd, true);
+    addFloatingMessage(cmd, FloatingMsg.Position.Random(), true);
   }
 
   function randomBetween(min: number, max: number) {
     return min + Math.random() * (max-min);
   }
 
-  function addFloatingMessage(text: string, emit = false) {
+  function addFloatingMessage(text: string, position: FloatingMsg.Position, emit = false) {
     let commandContainer = document.getElementById('floating-msg-container');
     if (commandContainer === null) {
       commandContainer = document.createElement('div');
@@ -327,11 +327,9 @@ const handleJmConsole = () => {
     // to pop out then shrink after
     commandIndicator.style.fontSize = '36px';
     
-    commandIndicator.style.top = `${Math.random()*100}%`;
-    if (Math.random() > 0.5) 
-      commandIndicator.style.left = `${Math.random()*70}px`;
-    else 
-      commandIndicator.style.right = `${Math.random()*70}px`;
+    commandIndicator.style.top = position.top;
+    commandIndicator.style.left = position.left;
+    commandIndicator.style.right = position.right;
 
     commandIndicator.addEventListener('transitionend', evt => {
       if ((<TransitionEvent> evt).propertyName == 'opacity') {
@@ -347,7 +345,14 @@ const handleJmConsole = () => {
     }, 50);
 
     if (emit) {
-      ws.socket.emit(SocketEvent.FloatingMsg, new FloatingMsgPayload(text));
+      ws.socket.emit(SocketEvent.FloatingMsg, new FloatingMsg.Payload(
+        text,
+        {
+          top: commandIndicator.style.top,
+          left: commandIndicator.style.left,
+          right: commandIndicator.style.right
+        }
+      ));
     }
   }
 

@@ -1,4 +1,4 @@
-import { SocketEvent, DrawingPayload, FloatingMsgPayload, LoginPayload } from './src/scripts/shared/socket-payloads';
+import { SocketEvent, DrawingPayload, FloatingMsg, LoginPayload } from './src/scripts/shared/socket-payloads';
 
 export default class SocketHandler {
   io: SocketIO.Server;
@@ -23,7 +23,7 @@ export default class SocketHandler {
     }
   }
   onFloatingMsg(socket: SocketIO.Socket) {
-    return (data: FloatingMsgPayload) => {
+    return (data: FloatingMsg.Payload) => {
       socket.broadcast.emit(SocketEvent.FloatingMsg, data);
     }
   }
