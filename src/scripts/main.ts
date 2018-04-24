@@ -1,7 +1,7 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
 import { J$, escapeHtml } from './util.js';
-import { SocketEvent, LoginPayload, FloatingMsg } from './shared/socket-payloads.js';
+import { SocketEvent, Login, FloatingMsg } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
@@ -33,11 +33,11 @@ const ws = new WebSocketInfo(io());
 ws.socket.on(SocketEvent.Login, onLogin);
 ws.socket.on(SocketEvent.Logout, onLogout);
 
-function onLogin(data: LoginPayload) {
+function onLogin(data: Login.Payload) {
   ws.totalOnline = data.totalOnline;
 }
 
-function onLogout(data: LoginPayload) {
+function onLogout(data: Login.Payload) {
   ws.totalOnline = data.totalOnline;
 }
 
