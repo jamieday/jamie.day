@@ -62,9 +62,9 @@ export namespace FloatingMsg {
       };
   
       if (Math.random() > 0.5) 
-        position.left = `${Math.random()*70}px`;
+        position.left = `${Math.random()*20}%`;
       else 
-        position.right = `${Math.random()*70}px`;
+        position.right = `${Math.random()*20}%`;
   
       return new Payload(message, `${randomBetween(8, 24)}px`, position);
     }
