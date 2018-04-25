@@ -60,7 +60,7 @@ body::-webkit-scrollbar-thumb
   height: 100%;
   content: '';
   background-color: var(--material-grey-900);
-  animation: translucinate 2s ease 1s 1 forwards; /* todo variables for these #s */
+  animation: translucinate 1s ease-in 500ms 1 forwards; /* todo variables for these #s */
 }
 h1 {
     font-size: 64px;
@@ -102,20 +102,66 @@ h1 {
   color: rgba(255, 255, 255, 0.2);
   transition: opacity 220s, font-size 500ms;
 }
+.bounce-in {
+  opacity: 0;
+  animation: bounceIn 1s ease 900ms forwards;
+}
+@keyframes bounceIn {
+  from,
+  20%,
+  40%,
+  60%,
+  80%,
+  to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  0% {
+    opacity: 0;
+    transform: scale3d(0.1, 0.1, 0.1);
+  }
+
+  20% {
+    transform: scale3d(1.1, 1.1, 1.1);
+  }
+
+  40% {
+    transform: scale3d(0.9, 0.9, 0.9);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale3d(1.03, 1.03, 1.03);
+  }
+
+  80% {
+    transform: scale3d(0.97, 0.97, 0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
 .fade-in {
   opacity: 0;
-  animation: fwade-in 1s ease 1s 1 forwards;
+  animation: fwade-in 1s ease 500ms 1 forwards;
 }
-.type-in {
+.fade-in-left {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  animation: typing 4s;
+  animation: fadeInLeft 1s ease;
 }
-/* The typing effect */
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 @keyframes fwade-in {
     from {
