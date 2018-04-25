@@ -2,40 +2,33 @@ export enum SocketEvent {
   Login = 'login',
   Logout = 'logout',
   Drawing = 'drawing',
+  CommandEntered = 'command-entered',
   FloatingMsg = 'floating-msg'
 }
 
 export namespace Login {
   export class Payload {
-    totalOnline: number;
-
-    constructor(totalOnline: number) {
-      this.totalOnline = totalOnline;
-    }
+    constructor(public totalOnline: number) {}
   }
 }
 
 export namespace Drawing {
   export class Payload {
-    x0: number;
-    y0: number;
-    x1: number;
-    y1: number;
-    color: string;
+    constructor(public x0: number, public y0: number, public x1: number, public y1: number, public color: string) {}
 
-    constructor(x0: number, y0: number, x1: number, y1: number, color: string) {
-      this.x0 = x0;
-      this.y0 = y0;
-      this.x1 = x1;
-      this.y1 = y1;
-      this.color = color;
-    }
+    isWithinBounds() { return true; }
   }
 }
 
 // todo move to util
 function randomBetween(min: number, max: number) {
   return min + Math.random() * (max-min);
+}
+
+export namespace CommandEntered {
+  export class Payload {
+    constructor(public command: string) {}
+  }
 }
 
 export namespace FloatingMsg {
@@ -46,14 +39,25 @@ export namespace FloatingMsg {
   }
 
   export class Payload {
-    message: string;
-    fontSize: string;
-    position: Position;
-  
-    constructor(message: string, fontSize: string, position: Position) {
-      this.message = message;
-      this.fontSize = fontSize;
+    static readonly maxMessageLength: number = 17;
+    static readonly minFontSize: number = 8;
+    static readonly maxFontSize: number = 24;
+
+    private constructor(public message: string, public fontSizePx: number, public position: Position) {
+      this.message = this.sanitizeMessage(message);
+      this.fontSizePx = fontSizePx;
       this.position = position;
+    }
+
+    sanitizeMessage(message: string) {
+      return message.length > 14
+        ? message.substring(0, 14) + '...'
+        : message;
+    }
+
+    isWithinBounds() {
+      return this.message.length < Payload.maxMessageLength
+        && this.fontSizePx < Payload.maxFontSize;
     }
 
     static Generate(message: string) {
@@ -66,7 +70,7 @@ export namespace FloatingMsg {
       else 
         position.right = `${Math.random()*20}%`;
   
-      return new Payload(message, `${randomBetween(8, 24)}px`, position);
+      return new Payload(message, randomBetween(Payload.minFontSize, Payload.maxFontSize), position);
     }
   }
 }

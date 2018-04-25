@@ -1,7 +1,7 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
 import { J$, escapeHtml } from './util.js';
-import { SocketEvent, Login, FloatingMsg } from './shared/socket-payloads.js';
+import { SocketEvent, Login, FloatingMsg, CommandEntered } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
@@ -305,10 +305,10 @@ const handleJmConsole = () => {
   });
 
   function onCommandEntered(cmd: string) {
-    addFloatingMessage(FloatingMsg.Payload.Generate(cmd), true);
+    ws.socket.emit(SocketEvent.CommandEntered, new CommandEntered.Payload(cmd));
   }
 
-  function addFloatingMessage(payload: FloatingMsg.Payload, emit = false) {
+  function addFloatingMessage(payload: FloatingMsg.Payload) {
     let commandContainer = document.getElementById('floating-msg-container');
     if (commandContainer === null) {
       commandContainer = document.createElement('div');
@@ -337,12 +337,8 @@ const handleJmConsole = () => {
     // see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions#JavaScript_examples
     setTimeout(() => {
       commandIndicator.style.opacity = '0';
-      commandIndicator.style.fontSize = payload.fontSize;
+      commandIndicator.style.fontSize = `${payload.fontSizePx}px`;
     }, 50);
-
-    if (emit) {
-      ws.socket.emit(SocketEvent.FloatingMsg, payload);
-    }
   }
 
   class CommandHistory { 

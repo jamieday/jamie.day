@@ -1,4 +1,4 @@
-import { SocketEvent, Drawing, FloatingMsg, Login } from './src/scripts/shared/socket-payloads';
+import { SocketEvent, Drawing, FloatingMsg, Login, CommandEntered } from './src/scripts/shared/socket-payloads';
 
 export default class SocketHandler {
   io: SocketIO.Server;
@@ -19,12 +19,16 @@ export default class SocketHandler {
   }
   onDraw(socket: SocketIO.Socket) {
     return (data: Drawing.Payload) => {
-      socket.broadcast.emit(SocketEvent.Drawing, data);
+      if (data.isWithinBounds()) {
+        socket.broadcast.emit(SocketEvent.Drawing, data);
+      }
     }
   }
-  onFloatingMsg(socket: SocketIO.Socket) {
-    return (data: FloatingMsg.Payload) => {
-      socket.broadcast.emit(SocketEvent.FloatingMsg, data);
+  onCommandEntered(socket: SocketIO.Socket) {
+    return (data: CommandEntered.Payload) => {
+      if (data.command.trim().length > 0) {
+        this.io.sockets.emit(SocketEvent.FloatingMsg, FloatingMsg.Payload.Generate(data.command));
+      }
     }
   }
   async onConnection(socket: SocketIO.Socket) {
@@ -32,7 +36,7 @@ export default class SocketHandler {
     this.io.sockets.emit(SocketEvent.Login, new Login.Payload(await this.getTotalOnline()));
     socket.on('disconnect', this.onDisconnect(socket).bind(this));
     socket.on(SocketEvent.Drawing, this.onDraw(socket));
-    socket.on(SocketEvent.FloatingMsg, this.onFloatingMsg(socket));
+    socket.on(SocketEvent.CommandEntered, this.onCommandEntered(socket));
   }
   onDisconnect(socket: SocketIO.Socket) {
     return async () => {
