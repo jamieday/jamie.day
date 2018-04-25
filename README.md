@@ -1,6 +1,7 @@
 # Todo List
 
 ## Features
+- Changing background changes background for everybody, but always comes back to original bg after 30 seconds (req backend persistence, localstorage?)
 - Blackboard
   - Persistence
   - Clear blackboard button allowing people to decline the clear if they say so within 10 seconds (like league surrender vote)
@@ -24,6 +25,10 @@ Can you type that again please?
 ```
 
 - Server-sided commands integrated with client-sided ones, command information aggregates server commands & client commands with little UI differentiation
+  - Server-sided admin commands
+    - Create command command? (write js)
+    konami enhanced console
+
 
 ## Architecture
 
