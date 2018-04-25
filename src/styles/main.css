@@ -87,7 +87,7 @@ h1 {
   outline: none;
 }
 #floating-msg-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -97,7 +97,7 @@ h1 {
 }
 .floating-msg {
   text-align: center;
-  position: fixed;
+  position: absolute;
   color: rgba(255, 255, 255, 0.2);
   animation: fadeOut 220s ease forwards,
     scaleOut 22s ease forwards;

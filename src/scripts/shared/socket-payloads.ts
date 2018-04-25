@@ -16,7 +16,7 @@ export namespace Drawing {
   export class Payload {
     constructor(public x0: number, public y0: number, public x1: number, public y1: number, public color: string) {}
 
-    isWithinBounds() { return true; }
+    static isWithinBounds(payload: Payload) { return true; }
   }
 }
 
@@ -53,11 +53,6 @@ export namespace FloatingMsg {
       return message.length > 14
         ? message.substring(0, 14) + '...'
         : message;
-    }
-
-    isWithinBounds() {
-      return this.message.length < Payload.maxMessageLength
-        && this.fontSizePx < Payload.maxFontSize;
     }
 
     static Generate(message: string) {

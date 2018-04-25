@@ -19,7 +19,7 @@ export default class SocketHandler {
   }
   onDraw(socket: SocketIO.Socket) {
     return (data: Drawing.Payload) => {
-      if (data.isWithinBounds()) {
+      if (Drawing.Payload.isWithinBounds(data)) {
         socket.broadcast.emit(SocketEvent.Drawing, data);
       }
     }

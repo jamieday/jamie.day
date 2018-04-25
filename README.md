@@ -32,5 +32,6 @@ Can you type that again please?
 
 ## Architecture
 
+- Perhaps socket payloads must be interfaces due to them being serialized (functions will be lost)
 - Command event-sourcing (history)
 - Command modularization
