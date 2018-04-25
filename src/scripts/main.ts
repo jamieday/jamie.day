@@ -327,16 +327,13 @@ const handleJmConsole = () => {
     commandIndicator.style.left = payload.position.left;
     commandIndicator.style.right = payload.position.right;
 
-    commandIndicator.addEventListener('transitionend', evt => {
-      if ((<TransitionEvent> evt).propertyName == 'opacity') {
-        (<HTMLElement> commandContainer).removeChild(commandIndicator);
-      }
+    commandIndicator.addEventListener('animationend', evt => {
+      (<HTMLElement> commandContainer).removeChild(commandIndicator);
     });
     commandContainer.appendChild(commandIndicator);
 
     // see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions#JavaScript_examples
     setTimeout(() => {
-      commandIndicator.style.opacity = '0';
       commandIndicator.style.fontSize = `${payload.fontSizePx}px`;
     }, 50);
   }

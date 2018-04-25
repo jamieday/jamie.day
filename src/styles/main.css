@@ -98,9 +98,18 @@ h1 {
 .floating-msg {
   text-align: center;
   position: fixed;
-  opacity: 1;
   color: rgba(255, 255, 255, 0.2);
-  transition: opacity 220s, font-size 500ms;
+  animation: fadeOut 220s ease forwards,
+    scaleOut 22s ease forwards;
+  transition: font-size 500ms;
+}
+@keyframes scaleOut {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(0, 0);
+  }
 }
 .bounce-in {
   opacity: 0;
@@ -152,6 +161,14 @@ h1 {
   overflow: hidden;
   white-space: nowrap;
   animation: fadeInLeft 1s ease;
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 @keyframes fadeInLeft {
   from {
