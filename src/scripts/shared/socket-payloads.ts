@@ -40,7 +40,7 @@ export namespace FloatingMsg {
 
   export class Payload {
     static readonly maxMessageLength: number = 17;
-    static readonly minFontSize: number = 8;
+    static readonly minFontSize: number = 16;
     static readonly maxFontSize: number = 24;
 
     private constructor(public message: string, public fontSizePx: number, public position: Position) {
@@ -57,7 +57,7 @@ export namespace FloatingMsg {
 
     static Generate(message: string) {
       const position: Position = <Position> {
-        top: `${Math.random()*80}%`
+        top: `${10+Math.random()*80}%`
       };
   
       if (Math.random() > 0.5) 

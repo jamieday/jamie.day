@@ -304,8 +304,30 @@ const handleJmConsole = () => {
     addFloatingMessage(data);
   });
 
-  function onCommandEntered(cmd: string) {
-    ws.socket.emit(SocketEvent.CommandEntered, new CommandEntered.Payload(cmd));
+  ws.socket.on(SocketEvent.CommandEntered, (data: CommandEntered.Payload) => {
+    onCommandEntered(data.command, false);
+  });
+
+  {
+    // Logo animations
+    const logoElement = <HTMLElement> document.getElementsByClassName('icon-circular')[0];
+    
+    // Click animation
+    logoElement.addEventListener('click', () => {
+      if (logoElement.classList.contains('bounce-in')) {
+        logoElement.classList.remove('bounce-in');
+      }
+      logoElement.style.animation = `rotateFun${Math.random() > 0.5 ? 'Reverse' : ''} 1s`;
+      setTimeout(() => {
+        window.location.replace('/');
+      }, 700);
+    });
+  }
+
+  function onCommandEntered(cmd: string, local: boolean) {
+    if (local) {
+      ws.socket.emit(SocketEvent.CommandEntered, new CommandEntered.Payload(cmd));
+    }
   }
 
   function addFloatingMessage(payload: FloatingMsg.Payload) {
@@ -420,7 +442,7 @@ const handleJmConsole = () => {
         commandHistory.addEntry(cmd);
         commandHistory.save();
 
-        onCommandEntered(cmd);
+        onCommandEntered(cmd, true);
 
         processCmdLoggedIn(cmd);
         break;

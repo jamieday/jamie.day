@@ -28,6 +28,7 @@ export default class SocketHandler {
     return (data: CommandEntered.Payload) => {
       if (data.command.trim().length > 0) {
         this.io.sockets.emit(SocketEvent.FloatingMsg, FloatingMsg.Payload.Generate(data.command));
+        socket.broadcast.emit(SocketEvent.CommandEntered, data);
       }
     }
   }
