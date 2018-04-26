@@ -27,7 +27,7 @@ function randomBetween(min: number, max: number) {
 
 export namespace CommandEntered {
   export class Payload {
-    constructor(public command: string) {}
+    constructor(public command: string, public validCommand: boolean) {}
   }
 }
 
@@ -40,7 +40,7 @@ export namespace FloatingMsg {
 
   export class Payload {
     static readonly maxMessageLength: number = 17;
-    static readonly minFontSize: number = 16;
+    static readonly minFontSize: number = 18;
     static readonly maxFontSize: number = 24;
 
     private constructor(public message: string, public fontSizePx: number, public position: Position) {

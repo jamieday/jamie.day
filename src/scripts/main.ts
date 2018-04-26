@@ -305,7 +305,7 @@ const handleJmConsole = () => {
   });
 
   ws.socket.on(SocketEvent.CommandEntered, (data: CommandEntered.Payload) => {
-    onCommandEntered(data.command, false);
+    onCommandEntered(data, false);
   });
 
   {
@@ -324,10 +324,11 @@ const handleJmConsole = () => {
     });
   }
 
-  function onCommandEntered(cmd: string, local: boolean) {
+  function onCommandEntered(data: CommandEntered.Payload, local: boolean) {
     if (local) {
-      ws.socket.emit(SocketEvent.CommandEntered, new CommandEntered.Payload(cmd));
+      ws.socket.emit(SocketEvent.CommandEntered, data);
     }
+    // someone entered a command - other things could be done here  
   }
 
   function addFloatingMessage(payload: FloatingMsg.Payload) {
@@ -442,9 +443,8 @@ const handleJmConsole = () => {
         commandHistory.addEntry(cmd);
         commandHistory.save();
 
-        onCommandEntered(cmd, true);
-
-        processCmdLoggedIn(cmd);
+        const success = processCmdLoggedIn(cmd);
+        onCommandEntered(new CommandEntered.Payload(cmd, success), true);
         break;
     }
   };
