@@ -57,7 +57,7 @@ export namespace FloatingMsg {
 
     static Generate(message: string) {
       const position: Position = <Position> {
-        top: `${Math.random()*100}%`
+        top: `${Math.random()*80}%`
       };
   
       if (Math.random() > 0.5) 
