@@ -34,7 +34,7 @@ export default class Blackboard {
 
     this.colors = document.createElement("div");
     this.colors.className = "colors";
-    this.colors.style.width = `${this.canvas.width}px`;
+    // this.colors.style.width = `${this.canvas.width}px`;
     for (let supportedColor of supportedColors) {
       let color = document.createElement("div");
       color.className = "color";

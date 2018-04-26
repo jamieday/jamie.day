@@ -300,6 +300,16 @@ const handleJmConsole = () => {
     }
   }
 
+  const logListElement = <HTMLUListElement> J$('.history-log ul');
+  function jLog(message: string) {
+    const li = document.createElement('li');
+    li.addEventListener('animationend', () => {
+      logListElement.removeChild(li);
+    });
+    li.textContent = message;
+    logListElement.appendChild(li);
+  }
+
   ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsg.Payload) => {
     addFloatingMessage(data);
   });

@@ -6,7 +6,15 @@
   --md-color: #dadada;
 }
 
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
+  display: flex;
+  flex-direction: column;
+
   font-family: 'Open Sans', 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
   background-color: var(--main-bg-color);
 }
@@ -40,12 +48,11 @@ body::-webkit-scrollbar-thumb
 .jm-background-img {
   display: block;
   transition: background-image 1s;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
   position: absolute;
-  top: 50px;
+  top: 0;
   left: 0;
   min-width: 100%;
-  min-height: calc(100% - 50px);
+  min-height: 100%;
   background-position: top;
   background-size: cover;
   background-repeat: no-repeat;
@@ -66,12 +73,34 @@ h1 {
     font-size: 64px;
 }
 .content {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
   color: white;
-  overflow: hidden; /* Ensures the content is not revealed until the type-in animation */
   letter-spacing: .15em; /* Adjust as needed */
 }
 .home-content {
-  margin-bottom: 26px;
+  flex: 1;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+  position: relative;
+  height: 100%;
+  padding: 20px 0;
+}
+.history-log {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 9px;
+  height: 120px;
+  overflow: hidden;
+}
+.history-log ul {
+  list-style-type: none;
+  color: #BDBDBD;
+}
+.history-log ul > li {
+  animation: fadeOut 2s ease-in 1s forwards;
 }
 #jm-console {
   display: inline-block;
@@ -213,7 +242,7 @@ h1 {
 }
 .icon-circular {
   display: block;
-  margin: 20px auto;
+  margin: 0px auto 20px auto;
   background: #ccc;
   border-radius: 50%;
   overflow: hidden;
@@ -237,9 +266,6 @@ h1 {
   align-items: center;
   width: 100%;
   background-color: var(--main-bg-color);
-}
-.content-container > * {
-  width: 100%;
 }
 
 .markdown-content {
