@@ -99,7 +99,10 @@ const handleBgImages = () => {
 const handleJmConsole = () => {
   const consoleElement = <HTMLInputElement> J$("#jm-console-input");
   const consoleInstructionsElement = J$("#jm-console-instructions");
-  const setInstructions = (instruction: string) => {
+  const setInstructions = (instruction: string, skipEscape: boolean = false) => {
+    if (!skipEscape) {
+      instruction = escapeHtml(instruction);
+    }
     const toHtml = (instruction: string) => {
       for (let i = 0; i < instruction.length; i++) {
         if (instruction.charAt(i) == "`") {
@@ -146,10 +149,10 @@ const handleJmConsole = () => {
               aliasesStr = separator;
               aliasesStr += command.aliases.join(separator);
             }
-            helpAvailableCmds += `\`${key}${aliasesStr}\` - ${commands[key].description}<br>`;
+            helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(aliasesStr)}\` - ${escapeHtml(commands[key].description)}<br>`;
           }
           helpAvailableCmds += "<br>New commands are actively being developed!";
-          setInstructions(helpAvailableCmds);
+          setInstructions(helpAvailableCmds, true);
         }
       },
       "resume": {
@@ -252,12 +255,13 @@ const handleJmConsole = () => {
       commandResult.run();
       return true;
     } else {
+      const cmdEscaped = escapeHtml(cmd);
       const errMessage = commandResult === CommandError.UsedShift
         ? `all lowercase please, this is a shift-unfriendly console..
-        <br>\`${cmd}\` -> \`${cmd.toLowerCase()}\``
-        : `\`${cmd}\` is not a recognized command 😢
+        <br>\`${cmdEscaped}\` -> \`${cmdEscaped.toLowerCase()}\``
+        : `\`${cmdEscaped}\` is not a recognized command 😢
         <br>If you want a list of available commands, try \`help\``;
-      setInstructions(errMessage);
+      setInstructions(errMessage, true);
       return false;
     }
   };
@@ -443,7 +447,7 @@ const handleJmConsole = () => {
           consoleElement.disabled = true;
           await sleep(400 + Math.random()*300);
           setInstructions("Access unlocked.<br>"
-           + " Try `help` to start off.");
+           + " Try `help` to start off.", true);
            consoleElement.disabled = false;
            consoleElement.focus();
            state = LOGGED_IN;
@@ -465,7 +469,7 @@ const handleJmConsole = () => {
     const keyCode = e.keyCode || e.which;
 
     if (keyCode == 13) { // press enter
-      processCmd(escapeHtml(consoleElement.value));
+      processCmd(consoleElement.value);
       return false;
     }
   };
