@@ -10,3 +10,13 @@ export function escapeHtml(html: string) {
   div.appendChild(text);
   return div.innerHTML;
 }
+
+const logListElement = <HTMLUListElement> J$('.history-log ul');
+export function log(message: string) {
+  const li = document.createElement('li');
+  li.addEventListener('animationend', () => {
+    logListElement.removeChild(li);
+  });
+  li.textContent = message;
+  logListElement.appendChild(li);
+}

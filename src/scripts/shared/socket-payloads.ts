@@ -1,4 +1,7 @@
 export enum SocketEvent {
+  Init = 'init',
+  Connection = 'connection', // value is based from socket io
+  Disconnect = 'disconnect', // value is based from socket io
   Login = 'login',
   Logout = 'logout',
   Drawing = 'drawing',
@@ -6,9 +9,39 @@ export enum SocketEvent {
   FloatingMsg = 'floating-msg'
 }
 
-export namespace Login {
+export namespace Init {
   export class Payload {
     constructor(public totalOnline: number) {}
+  }
+}
+
+export namespace Connect {
+  export class Payload {
+    constructor() {}
+  }
+}
+
+export namespace Disconnect {
+  export class Payload {
+    constructor() {}
+  }
+}
+
+export namespace Login {
+  export class EmitPayload {
+    constructor(public username: string) {}
+  }
+  export class EventPayload {
+    constructor(public username: string, public totalOnline: number) {}
+  }
+}
+
+export namespace Logout {
+  export class EmitPayload {
+    constructor() {}
+  }
+  export class EventPayload {
+    constructor(public username: string, public totalOnline: number) {}
   }
 }
 

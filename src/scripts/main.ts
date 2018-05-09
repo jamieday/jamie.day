@@ -1,7 +1,7 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
-import { J$, escapeHtml } from './util.js';
-import { SocketEvent, Login, FloatingMsg, CommandEntered } from './shared/socket-payloads.js';
+import { J$, escapeHtml, log } from './util.js';
+import { SocketEvent, Login, FloatingMsg, CommandEntered, Connect, Disconnect, Logout, Init } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
@@ -9,19 +9,23 @@ const markdownConverter = new showdown.Converter();
 
 export class WebSocketInfo {
   public socket: SocketIOClient.Socket;
-  private _totalOnline: number;
+  private _totalOnline: number = 0;
   
   constructor(socket: SocketIOClient.Socket) {
     this.socket = socket;
-    this._totalOnline = 0;
+    this.totalOnline = 0;
+  }
+
+  initialize(data: Init.Payload) {
+    this.totalOnline = data.totalOnline;
   }
 
   set totalOnline(value) {
     this._totalOnline = value;
-
+    
     const countElement = <HTMLElement> J$(".online-count");
     countElement.style.visibility = "visible";
-    countElement.innerHTML = `${escapeHtml(ws.totalOnline.toString())} <span style="color:#BDBDBD">online</span>`;
+    countElement.innerHTML = `${escapeHtml(this._totalOnline.toString())} <span style="color:#BDBDBD">online</span>`;
   }
   get totalOnline() {
     return this._totalOnline;
@@ -30,15 +34,27 @@ export class WebSocketInfo {
 
 const ws = new WebSocketInfo(io());
 
-ws.socket.on(SocketEvent.Login, onLogin);
-ws.socket.on(SocketEvent.Logout, onLogout);
-
-function onLogin(data: Login.Payload) {
+ws.socket.on(SocketEvent.Init, (data: Init.Payload) => {
+  // Connected, received initialization payload
+  ws.initialize(data);
+});
+ws.socket.on(SocketEvent.Login, (data: Login.EventPayload) => {
   ws.totalOnline = data.totalOnline;
+  log(`${data.username} connected.`);
+});
+ws.socket.on(SocketEvent.Logout, (data: Logout.EventPayload) => {
+  ws.totalOnline = data.totalOnline;
+  log(`${data.username} has left.`);
+});
+
+let username = null;
+function loginWithUsername(name: string) {
+  username = name;
+  ws.socket.emit(SocketEvent.Login, new Login.EmitPayload(username));
 }
-
-function onLogout(data: Login.Payload) {
-  ws.totalOnline = data.totalOnline;
+function logout() {
+  username = null;
+  ws.socket.emit(SocketEvent.Logout, new Logout.EmitPayload());
 }
 
 const getBackgroundImageElement = () => <HTMLElement> document.getElementsByClassName("jm-background-img")[0];
@@ -221,13 +237,15 @@ const handleJmConsole = () => {
           commandHistory.clear();
         },
       },
-      "exit": {
-        description: "reset console",
+      "logout": {
+        description: "logout of the console",
         run: () => {
           collapseContent();
+          logout();
+          consoleState = ConsoleState.Init;
           resetConsole();
         },
-        aliases: ["logout", "reset"]
+        aliases: ["exit"]
       }
     };
     enum CommandError {
@@ -266,18 +284,22 @@ const handleJmConsole = () => {
     }
   };
 
-
   async function sleep(ms: number) {
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
   // Handle commands
-  const INIT = 0, LOGGED_IN = 1;
-  let state = INIT;
-  const welcomeMsg = "Type `help` for a list of commands.";
-  let resetConsole = () => {
-    state = LOGGED_IN;
-    setInstructions(welcomeMsg);
+  enum ConsoleState {
+    Init = 0,
+    LoggedIn = 1
   }
+  const consoleStates : { [index: number] : { welcomeMsg: string } } = {
+    [ConsoleState.Init]: { welcomeMsg: "Hey! What's your name?" },
+    [ConsoleState.LoggedIn]: { welcomeMsg: "Type `help` for a list of commands." }
+  }
+  let consoleState = ConsoleState.Init;
+  let resetConsole = () => {
+    setInstructions(consoleStates[consoleState].welcomeMsg);  
+  } // WIP login() etc
   resetConsole();
   
   const getContentContainerElement = () => <HTMLElement> document.getElementsByClassName("content-container")[0];
@@ -302,16 +324,6 @@ const handleJmConsole = () => {
         block: "start",
       });
     }
-  }
-
-  const logListElement = <HTMLUListElement> J$('.history-log ul');
-  function jLog(message: string) {
-    const li = document.createElement('li');
-    li.addEventListener('animationend', () => {
-      logListElement.removeChild(li);
-    });
-    li.textContent = message;
-    logListElement.appendChild(li);
   }
 
   ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsg.Payload) => {
@@ -440,20 +452,13 @@ const handleJmConsole = () => {
   const processCmd = async (cmd: string) => {
     clearConsole();
     if (!cmd.trim()) return;
-    switch (state) {
-      case INIT:
-        if (cmd === "CORRECT_PASSWORD") {
-          setInstructions("Validating password...");
-          consoleElement.disabled = true;
-          await sleep(400 + Math.random()*300);
-          setInstructions("Access unlocked.<br>"
-           + " Try `help` to start off.", true);
-           consoleElement.disabled = false;
-           consoleElement.focus();
-           state = LOGGED_IN;
-        }
+    switch (consoleState) {
+      case ConsoleState.Init:
+        loginWithUsername(cmd);
+        consoleState = ConsoleState.LoggedIn;
+        resetConsole();
         break;
-      case LOGGED_IN:
+      case ConsoleState.LoggedIn:
         commandHistory.addEntry(cmd);
         commandHistory.save();
 
@@ -478,13 +483,15 @@ const handleJmConsole = () => {
     e = e || window.event;
     const keyCode = e.keyCode || e.which;
 
-    if (keyCode == 38) { // press up arrow
-      consoleElement.value = commandHistory.moveUp(consoleElement.value) || '';
-      return false;
-    }
-    if (keyCode == 40) { // press down arrow
-      consoleElement.value = commandHistory.moveDown(consoleElement.value) || '';
-      return false;
+    if (consoleState == ConsoleState.LoggedIn) {
+      if (keyCode == 38) { // press up arrow
+        consoleElement.value = commandHistory.moveUp(consoleElement.value) || '';
+        return false;
+      }
+      if (keyCode == 40) { // press down arrow
+        consoleElement.value = commandHistory.moveDown(consoleElement.value) || '';
+        return false;
+      }
     }
   };
 
