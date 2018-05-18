@@ -1,6 +1,7 @@
 # Todo List
 
 ## Features
+- (c) 2018 Jamie Day, All Rights Reserved.
 - Changing background changes background for everybody, but always comes back to original bg after 30 seconds (req backend persistence, localstorage?)
 - Blackboard
   - Persistence

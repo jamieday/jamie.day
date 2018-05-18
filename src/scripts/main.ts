@@ -357,13 +357,77 @@ const handleJmConsole = () => {
     // someone entered a command - other things could be done here  
   }
 
+  function getAbsoluteContainer() {
+    let container = document.getElementById('absolute-container');
+    if (container === null) {
+      container = document.createElement('div');
+      container.id = 'absolute-container';
+      document.body.appendChild(container);
+    }
+    return container;
+  }
+
+  let totalParticles = 0;
+
+  setTimeout(() => {
+    // Start with 50 particles
+    for (let i = 0; i < 50; i++) 
+      spawnParticle();
+
+    const particleLimit = 100;
+    
+    function trySpawnParticles() {
+      setTimeout(trySpawnParticles, Math.random()*750);
+
+      if (totalParticles >= particleLimit)
+        return;
+      spawnParticle();
+    }
+    trySpawnParticles();
+  }, 1000);
+
+  function spawnParticle() {
+    const container = getAbsoluteContainer();
+
+    const particle = document.createElement('div');
+    particle.className = `particle`;
+
+    // initial size to pop out then shrink after
+    const radiusPx = 5+Math.random()*50;
+    particle.style.width = `${radiusPx}px`;
+    particle.style.height = `${radiusPx}px`;
+    
+    particle.style.top = `${Math.random()*100}%`;//payload.position.top;
+    particle.style.left = `${Math.random()*100}%`;//payload.position.left;
+    particle.style.right = `${Math.random()*100}%`;//payload.position.right;
+
+    particle.addEventListener('transitionend', evt => {
+      if ((<TransitionEvent> evt).propertyName === 'opacity' && evt.srcElement && (<HTMLElement> evt.srcElement).style.opacity === '0') {
+        (<HTMLElement> container).removeChild(particle);
+        totalParticles--;
+      }
+    });
+    container.appendChild(particle);
+    totalParticles++;
+
+    setTimeout(() => {
+      particle.style.opacity = '1';
+    }, 50);
+
+    setTimeout(function moveToRandomDestination() {
+      // Set into motion with randomness
+      particle.style.transform = `translate(${Math.random() > 0.5 ? '-' : ''}${Math.random()*1000}%, ${Math.random() > 0.5 ? '-' : ''}${Math.random()*1000}%)`;
+      setTimeout(moveToRandomDestination, Math.random()*3500);
+    }, 50);
+
+    setTimeout(() => {
+      // Fade out eventually
+      particle.style.opacity = '0';
+    }, 2000+Math.random()*20000);
+  }
+
   function addFloatingMessage(payload: FloatingMsg.Payload) {
-    let commandContainer = document.getElementById('floating-msg-container');
-    if (commandContainer === null) {
-      commandContainer = document.createElement('div');
-      commandContainer.id = 'floating-msg-container';
-      document.body.appendChild(commandContainer);
-    } 
+    const container = getAbsoluteContainer();
 
     const commandIndicator = document.createElement('div');
     commandIndicator.className = `floating-msg ${payload.message}`;
@@ -377,9 +441,9 @@ const handleJmConsole = () => {
     commandIndicator.style.right = payload.position.right;
 
     commandIndicator.addEventListener('animationend', evt => {
-      (<HTMLElement> commandContainer).removeChild(commandIndicator);
+      (<HTMLElement> container).removeChild(commandIndicator);
     });
-    commandContainer.appendChild(commandIndicator);
+    container.appendChild(commandIndicator);
 
     // see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions#JavaScript_examples
     setTimeout(() => {
