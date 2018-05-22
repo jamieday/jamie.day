@@ -105,6 +105,9 @@ h1 {
 }
 #jm-console {
   display: inline-block;
+  width: 50%;
+  height: 350px;
+  
   padding: 15px;
   text-align: left;
   color: #BDBDBD;

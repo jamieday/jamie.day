@@ -20,3 +20,30 @@ export function log(message: string) {
   li.textContent = message;
   logListElement.appendChild(li);
 }
+
+class MarkdownFile {
+  filename: string;
+  content: Promise<string>
+
+  constructor(filename: string) {
+    this.filename = filename;
+    this.content = (async () => (await fetch(filename)).text())();
+  }
+}
+
+export class MarkdownText {
+  constructor(public content: string) {}
+}
+
+// preload text
+export const markdownFiles = {
+  techInfo: new MarkdownFile("/text/tech-info.md")
+};
+
+export abstract class Dictionary<T>  {
+  protected abstract map: { [index: string]: T };
+  get = (key: string) => this.hasOwnProperty(key)
+      ? this.map[key]
+      : undefined;
+  getAll = () => this.map;
+}

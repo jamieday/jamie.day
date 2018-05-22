@@ -1,10 +1,10 @@
-declare const showdown: { Converter: Showdown.ConverterStatic };
-
-import { J$, escapeHtml, log } from './util.js';
+import { J$, escapeHtml, log, MarkdownText } from './util.js';
 import { SocketEvent, Login, FloatingMsg, CommandEntered, Connect, Disconnect, Logout, Init } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
-import { Showdown } from './modules/showdown/showdown.js';
+import { CommandDictionary, Command } from './jamie-cli.js';
 
+import { Showdown } from './modules/showdown/showdown.js';
+declare const showdown: { Converter: Showdown.ConverterStatic };
 const markdownConverter = new showdown.Converter();
 
 export class WebSocketInfo {
@@ -52,7 +52,7 @@ function loginWithUsername(name: string) {
   username = name;
   ws.socket.emit(SocketEvent.Login, new Login.EmitPayload(username));
 }
-function logout() {
+function performLogout() {
   username = null;
   ws.socket.emit(SocketEvent.Logout, new Logout.EmitPayload());
 }
@@ -80,22 +80,6 @@ for (let i=0; i<backgroundImages.length; i++) {
   img.src = backgroundImages[i];
 }
 
-class MarkdownFile {
-  filename: string;
-  content: Promise<string>
-
-  constructor(filename: string) {
-    this.filename = filename;
-    this.content = (async () => (await fetch(filename)).text())();
-  }
-}
-
-// preload text
-const markdownFiles = {
-  techInfo: new MarkdownFile("/text/tech-info.md")
-};
-
-
 window.onload = () => {
   handleBgImages();
   handleJmConsole();
@@ -112,152 +96,155 @@ const handleBgImages = () => {
   changeBg();
 };
 
+export class PageController {
+  constructor(
+    private contentContainer: HTMLElement,
+    private markdownConverter: Showdown.Converter
+  ) {}
+  replaceContent(content: HTMLElement | MarkdownText) {
+    if (content instanceof MarkdownText) {
+      const markdown = content;
+      content = document.createElement('div');
+      content.className = 'markdown-content';
+      content.innerHTML = this.markdownConverter.makeHtml(markdown.content);
+    }
+    this.contentContainer.style.display = "flex";
+    this.contentContainer.innerHTML = '';
+
+    this.contentContainer.appendChild(content);
+    content.style.opacity = '1';
+
+    this.contentContainer.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+  collapseContent() {
+    this.contentContainer.style.display = "none";
+    this.contentContainer.innerHTML = '';
+  }
+  changeBackground() {
+
+  }
+}
+
+export class CommandHistoryController { 
+  private static readonly historyStorageKey: string = 'JD_HISTORY_STORAGE';
+
+  private readonly storage: Storage;
+
+  private history: string[]; 
+  private pointer: number = 0;
+
+  constructor(storage: Storage) {
+    this.storage = storage;
+    this.history = this.load();
+    this.pointer = this.history.length;
+  }
+
+  private load() {
+    const existingHistoryJson = this.storage.getItem(CommandHistoryController.historyStorageKey);
+    if (existingHistoryJson === null) {
+      return [];
+    }
+    return <string[]> JSON.parse(existingHistoryJson);
+  }
+
+  save() {
+    this.storage.setItem(CommandHistoryController.historyStorageKey, JSON.stringify(this.history));
+  }
+
+  get currentEntry() {
+    if (this.pointer < 0 || this.pointer >= this.history.length) return null;
+    return this.history[this.pointer];
+  }
+
+  addEntry(entry: string) {
+    this.history.push(entry);
+    this.pointer = this.history.length; // keep pointer after history
+  }
+
+  clear() {
+    this.history = [];
+    this.pointer = 0;
+    this.save();
+  }
+
+  moveUp(currentInput: string) {
+    if (this.history.length === 0) {
+      this.addEntry(currentInput);
+    }
+    if (this.pointer > 0)
+      this.pointer--;
+    return this.currentEntry;
+  }
+
+  moveDown(currentInput: string) {
+    if (this.pointer > this.history.length - 1)
+      return currentInput;
+    
+    this.pointer++;
+    return this.currentEntry;
+  }
+}
+
+const commandHistoryController = new CommandHistoryController(localStorage);
+
+export class CliController {
+  private static consoleElement = <HTMLInputElement> J$("#jm-console-input");
+  private static consoleInstructionsElement = J$("#jm-console-instructions");
+ 
+  out(html: string) {
+    CliController.consoleInstructionsElement.innerHTML += html;
+  }
+  outMD(markdown: string) {
+    this.out(markdownConverter.makeHtml(markdown));
+  }
+  logout() {
+    performLogout();
+  }
+  clear() {
+    CliController.consoleElement.value = "";
+  }
+}
+
+interface UserInterface<T> {
+  in: () => Promise<T>;
+  out: (output: T) => void;
+}
+
+export interface UserInterfaceMD extends UserInterface<string> {}
+
+function getContentContainerElement() { return <HTMLElement> document.getElementsByClassName("content-container")[0]; }
+
+const cliController = new CliController();
+
+const commandDictionary = new CommandDictionary(
+  ws,
+  {
+    in: async () => "",
+    out: cliController.outMD
+  },
+  new PageController(getContentContainerElement(), markdownConverter),
+  commandHistoryController,
+  cliController
+);
+
 const handleJmConsole = () => {
   const consoleElement = <HTMLInputElement> J$("#jm-console-input");
   const consoleInstructionsElement = J$("#jm-console-instructions");
-  const setInstructions = (instruction: string, skipEscape: boolean = false) => {
-    if (!skipEscape) {
-      instruction = escapeHtml(instruction);
-    }
-    const toHtml = (instruction: string) => {
-      for (let i = 0; i < instruction.length; i++) {
-        if (instruction.charAt(i) == "`") {
-          for (let j = i+1; j < instruction.length; j++) {
-            if (instruction.charAt(j) == "`") {
-              const opening = '<span style="color: #ef5350">';
-              const closing = '</span>';
-              instruction = instruction.substring(0, i)
-                + opening
-                + instruction.substring(i+1, j)
-                + closing
-                + instruction.substring(j+1);
-              i = j + closing.length;
-              break;
-            }
-          }
-        }
-      }
-      return instruction;
-    };
-    consoleInstructionsElement.innerHTML = toHtml(instruction);
-  };
-  const clearConsole = () => {
-    consoleElement.value = "";
-  };
-
-  interface Command {
-    description: string;
-    run: () => void;
-    aliases?: string[];
-  }
-
   const processCmdLoggedIn = (cmd: string) => {
-    const commands: { [index:string] : Command } = {
-      "help": {
-        description: "list all available commands",
-        run: () => {
-          let helpAvailableCmds = "";
-          for (const key in commands) {
-            let command = commands[key];
-            let aliasesStr = '';
-            if (command.aliases) {
-              const separator = " / ";
-              aliasesStr = separator;
-              aliasesStr += command.aliases.join(separator);
-            }
-            helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(aliasesStr)}\` - ${escapeHtml(commands[key].description)}<br>`;
-          }
-          helpAvailableCmds += "<br>New commands are actively being developed!";
-          setInstructions(helpAvailableCmds, true);
-        }
-      },
-      "resume": {
-        description: "open my resume",
-        run: () => {
-          window.open('/resume.pdf', '_blank');
-        },
-        aliases: ["cv"]
-      },
-      "tech-info": {
-        description: "read how jamieday.ca works",
-        run: async () => {
-          const techInfoContent = document.createElement('div');
-          techInfoContent.className = 'markdown-content';
-          techInfoContent.innerHTML = markdownConverter.makeHtml(await markdownFiles.techInfo.content);
-          
-          replaceContent(techInfoContent);
-          techInfoContent.style.opacity = '1';
-          
-          resetConsole();
-        }
-      },
-      "blackboard": {
-        description: "toggle the online blackboard",
-        run: () => {
-          const containerId = 'blackboard-container';
-          const blackboardContainer = document.getElementById(containerId);
-      
-          if (blackboardContainer !== null) {
-            collapseContent();
-            setInstructions("Board of that! Type `help` for more.");
-          } else {
-            const blackboardContainer = document.createElement("div");
-            blackboardContainer.id = containerId;
-      
-            const blackboard = new Blackboard(ws);
-            blackboard.attachTo(blackboardContainer);
-      
-            replaceContent(blackboardContainer);
-            resetConsole();
-          }
-        }
-      },
-      "changebg": {
-        description: "change the background",
-        run: () => {
-          changeBg();
-          setInstructions("Background changed.");
-        }
-      },
-      "linkedin": {
-        description: "open my linkedin in a new tab",
-        run: () => {
-          window.open('https://www.linkedin.com/in/dayjamie/', '_blank');
-        }
-      },
-      "github": {
-        description: "open my github in a new tab",
-        run: () => {
-          window.open('https://github.com/jamieday/', '_blank');
-        }
-      },
-      "clear": {
-        description: "clear command history",
-        run: () => {
-          commandHistory.clear();
-        },
-      },
-      "logout": {
-        description: "logout of the console",
-        run: () => {
-          collapseContent();
-          logout();
-          consoleState = ConsoleState.Init;
-          resetConsole();
-        },
-        aliases: ["exit"]
-      }
-    };
     enum CommandError {
       UsedShift,
       UnrecognizedCommand
     }
     function findCommand(cmd: string) {
-      if (commands.hasOwnProperty(cmd)) {
-        return commands[cmd];
+      const command = commandDictionary.get(cmd);
+      if (typeof command !== 'undefined') {
+        return command;
       }
-      for (const key in commands) {
-        const command = commands[key];
+      for (const key in commandDictionary.getAll()) {
+        const command = <Command> commandDictionary.get(key);
         if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
           return command;
         } else if (cmd.toLowerCase() == key.toLowerCase() || (command.aliases && command.aliases.map(s => s.toLowerCase()).indexOf(cmd.toLowerCase()) !== -1)) {
@@ -276,10 +263,10 @@ const handleJmConsole = () => {
       const cmdEscaped = escapeHtml(cmd);
       const errMessage = commandResult === CommandError.UsedShift
         ? `all lowercase please, this is a shift-unfriendly console..
-        <br>\`${cmdEscaped}\` -> \`${cmdEscaped.toLowerCase()}\``
+        \n\`${cmdEscaped}\` -> \`${cmdEscaped.toLowerCase()}\``
         : `\`${cmdEscaped}\` is not a recognized command 😢
         <br>If you want a list of available commands, try \`help\``;
-      setInstructions(errMessage, true);
+      cliController.out(errMessage);
       return false;
     }
   };
@@ -298,33 +285,11 @@ const handleJmConsole = () => {
   }
   let consoleState = ConsoleState.Init;
   let resetConsole = () => {
-    setInstructions(consoleStates[consoleState].welcomeMsg);  
+    cliController.out(consoleStates[consoleState].welcomeMsg);  
   } // WIP login() etc
   resetConsole();
   
-  const getContentContainerElement = () => <HTMLElement> document.getElementsByClassName("content-container")[0];
-
   const initialPadding = getContentContainerElement().style.padding;
-
-  function collapseContent() {
-    const contentContainer = getContentContainerElement();
-    contentContainer.style.display = "none";
-    contentContainer.innerHTML = '';
-  }
-  function replaceContent(element: HTMLElement, autoscroll = true) {
-    const contentContainer = getContentContainerElement();
-    contentContainer.style.display = "flex";
-    contentContainer.innerHTML = '';
-
-    contentContainer.appendChild(element);
-
-    if (autoscroll) {
-      contentContainer.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }
 
   ws.socket.on(SocketEvent.FloatingMsg, (data: FloatingMsg.Payload) => {
     addFloatingMessage(data);
@@ -450,71 +415,8 @@ const handleJmConsole = () => {
       commandIndicator.style.fontSize = `${payload.fontSizePx}px`;
     }, 50);
   }
-
-  class CommandHistory { 
-    private static readonly historyStorageKey: string = 'JD_HISTORY_STORAGE';
-
-    private readonly storage: Storage;
-
-    private history: string[]; 
-    private pointer: number = 0;
-
-    constructor(storage: Storage) {
-      this.storage = storage;
-      this.history = this.load();
-      this.pointer = this.history.length;
-    }
-
-    private load() {
-      const existingHistoryJson = this.storage.getItem(CommandHistory.historyStorageKey);
-      if (existingHistoryJson === null) {
-        return [];
-      }
-      return <string[]> JSON.parse(existingHistoryJson);
-    }
-
-    save() {
-      this.storage.setItem(CommandHistory.historyStorageKey, JSON.stringify(this.history));
-    }
-
-    get currentEntry() {
-      if (this.pointer < 0 || this.pointer >= this.history.length) return null;
-      return this.history[this.pointer];
-    }
-
-    addEntry(entry: string) {
-      this.history.push(entry);
-      this.pointer = this.history.length; // keep pointer after history
-    }
-
-    clear() {
-      this.history = [];
-      this.pointer = 0;
-      this.save();
-    }
-
-    moveUp(currentInput: string) {
-      if (this.history.length === 0) {
-        this.addEntry(currentInput);
-      }
-      if (this.pointer > 0)
-        this.pointer--;
-      return this.currentEntry;
-    }
-
-    moveDown(currentInput: string) {
-      if (this.pointer > this.history.length - 1)
-        return currentInput;
-      
-      this.pointer++;
-      return this.currentEntry;
-    }
-  }
-
-  const commandHistory = new CommandHistory(localStorage);
   
   const processCmd = async (cmd: string) => {
-    clearConsole();
     if (!cmd.trim()) return;
     switch (consoleState) {
       case ConsoleState.Init:
@@ -523,8 +425,8 @@ const handleJmConsole = () => {
         resetConsole();
         break;
       case ConsoleState.LoggedIn:
-        commandHistory.addEntry(cmd);
-        commandHistory.save();
+        commandHistoryController.addEntry(cmd);
+        commandHistoryController.save();
 
         const success = processCmdLoggedIn(cmd);
         onCommandEntered(new CommandEntered.Payload(cmd, success), true);
@@ -549,11 +451,11 @@ const handleJmConsole = () => {
 
     if (consoleState == ConsoleState.LoggedIn) {
       if (keyCode == 38) { // press up arrow
-        consoleElement.value = commandHistory.moveUp(consoleElement.value) || '';
+        consoleElement.value = commandHistoryController.moveUp(consoleElement.value) || '';
         return false;
       }
       if (keyCode == 40) { // press down arrow
-        consoleElement.value = commandHistory.moveDown(consoleElement.value) || '';
+        consoleElement.value = commandHistoryController.moveDown(consoleElement.value) || '';
         return false;
       }
     }
