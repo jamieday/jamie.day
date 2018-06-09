@@ -33,4 +33,4 @@ Commands are stored in an dictionary in which the key is the command name, so ru
 
 It's noted that the `tech-info` command itself can be made more simple & extensible through an abstraction of commands which display markdown content - this is one of my tech-debts!
 
-This site itself is now open-source - find it on [Github](https://github.com/jday370/jamieday.ca)! 🤓
+This site itself is now open-source - find it on [Github](https://github.com/jamieday/jamieday.ca)! 🤓

@@ -228,7 +228,7 @@ const handleJmConsole = () => {
       "github": {
         description: "open my github in a new tab",
         run: () => {
-          window.open('https://github.com/jday370/', '_blank');
+          window.open('https://github.com/jamieday/', '_blank');
         }
       },
       "clear": {
