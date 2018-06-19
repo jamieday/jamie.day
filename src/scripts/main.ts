@@ -176,7 +176,7 @@ const handleJmConsole = () => {
         run: () => {
           window.open('/resume.pdf', '_blank');
         },
-        aliases: ["cv"]
+        aliases: ["cv", "doxx"]
       },
       "tech-info": {
         description: "read how jamieday.ca works",
