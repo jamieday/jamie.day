@@ -29,6 +29,9 @@ if (skipCssPipeline) {
   // use styles from source in dev instead of preprocessed
   app.use('/styles', express.static(path.join(__dirname, 'src', 'styles')));
 }
+if (isDev) {
+  app.use('/src/scripts', express.static(path.join(__dirname, 'src', 'scripts')));
+}
 
 // views is directory for all template files
 app.set('views', path.join(__dirname, 'views'));
