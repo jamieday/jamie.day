@@ -191,20 +191,27 @@ export class CommandHistoryController {
 const commandHistoryController = new CommandHistoryController(localStorage);
 
 export class CliController {
-  private static consoleElement = <HTMLInputElement> J$("#jm-console-input");
+  private static consoleElement = <HTMLElement> J$("#jm-console");
+  private static consoleInputElement = <HTMLInputElement> J$("#jm-console-input");
   private static consoleInstructionsElement = J$("#jm-console-instructions");
  
   out(html: string) {
     CliController.consoleInstructionsElement.innerHTML += html;
   }
-  outMD(markdown: string) {
+  outMD = (markdown: string) => {
     this.out(markdownConverter.makeHtml(markdown));
   }
   logout() {
     performLogout();
   }
-  clear() {
-    CliController.consoleElement.value = "";
+  clearInput() {
+    CliController.consoleInputElement.value = '';
+  }
+  clearInstructions() {
+    CliController.consoleInstructionsElement.innerHTML = '';
+  }
+  scrollToBottom() {
+    CliController.consoleElement.scrollTop = CliController.consoleElement.scrollHeight;
   }
 }
 
@@ -231,7 +238,8 @@ const commandDictionary = new CommandDictionary(
 );
 
 const handleJmConsole = () => {
-  const consoleElement = <HTMLInputElement> J$("#jm-console-input");
+  const consoleElement = <HTMLElement> J$('#jm-console');
+  const consoleInputElement = <HTMLInputElement> J$('#jm-console-input');
   const consoleInstructionsElement = J$("#jm-console-instructions");
   const processCmdLoggedIn = (cmd: string) => {
     enum CommandError {
@@ -245,7 +253,7 @@ const handleJmConsole = () => {
       }
       for (const key in commandDictionary.getAll()) {
         const command = <Command> commandDictionary.get(key);
-        if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
+        if (cmd == key || (typeof command.aliases !== 'undefined' && command.aliases.indexOf(cmd) !== -1)) {
           return command;
         } else if (cmd.toLowerCase() == key.toLowerCase() || (command.aliases && command.aliases.map(s => s.toLowerCase()).indexOf(cmd.toLowerCase()) !== -1)) {
           return CommandError.UsedShift;
@@ -266,7 +274,7 @@ const handleJmConsole = () => {
         \n\`${cmdEscaped}\` -> \`${cmdEscaped.toLowerCase()}\``
         : `\`${cmdEscaped}\` is not a recognized command 😢
         <br>If you want a list of available commands, try \`help\``;
-      cliController.out(errMessage);
+      cliController.outMD(errMessage);
       return false;
     }
   };
@@ -279,13 +287,14 @@ const handleJmConsole = () => {
     Init = 0,
     LoggedIn = 1
   }
-  const consoleStates : { [index: number] : { welcomeMsg: string } } = {
-    [ConsoleState.Init]: { welcomeMsg: "Hey! What's your name?" },
-    [ConsoleState.LoggedIn]: { welcomeMsg: "Type `help` for a list of commands." }
+  const consoleStates : { [index: number] : { welcomeMsgMD: string } } = {
+    [ConsoleState.Init]: { welcomeMsgMD: "Hey! What's your name?" },
+    [ConsoleState.LoggedIn]: { welcomeMsgMD: "Welcome. Type `help` for a list of commands." }
   }
   let consoleState = ConsoleState.Init;
   let resetConsole = () => {
-    cliController.out(consoleStates[consoleState].welcomeMsg);  
+    cliController.clearInstructions();
+    cliController.outMD(consoleStates[consoleState].welcomeMsgMD);  
   } // WIP login() etc
   resetConsole();
   
@@ -435,27 +444,32 @@ const handleJmConsole = () => {
   };
 
   // Add key events for handling input
-  consoleElement.onkeypress = e => {
+  consoleInputElement.onkeypress = e => {
     e = e || window.event;
     const keyCode = e.keyCode || e.which;
 
     if (keyCode == 13) { // press enter
-      processCmd(consoleElement.value);
+      cliController.outMD('\n');
+      processCmd(consoleInputElement.value);
+
+      cliController.clearInput();
+      cliController.scrollToBottom();
+      
       return false;
     }
   };
 
-  consoleElement.onkeydown = e => {
+  consoleInputElement.onkeydown = e => {
     e = e || window.event;
     const keyCode = e.keyCode || e.which;
 
     if (consoleState == ConsoleState.LoggedIn) {
       if (keyCode == 38) { // press up arrow
-        consoleElement.value = commandHistoryController.moveUp(consoleElement.value) || '';
+        consoleInputElement.value = commandHistoryController.moveUp(consoleInputElement.value) || '';
         return false;
       }
       if (keyCode == 40) { // press down arrow
-        consoleElement.value = commandHistoryController.moveDown(consoleElement.value) || '';
+        consoleInputElement.value = commandHistoryController.moveDown(consoleInputElement.value) || '';
         return false;
       }
     }
@@ -463,6 +477,6 @@ const handleJmConsole = () => {
 
   // Focus console input if console is clicked
   (<HTMLElement> J$("#jm-console")).onclick = () => {
-    consoleElement.focus();
+    consoleInputElement.focus();
   };
 };

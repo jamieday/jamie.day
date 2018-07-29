@@ -64,7 +64,7 @@ class CommandHelp implements Command {
         aliasesStr = separator;
         aliasesStr += command.aliases.join(separator);
       }
-      helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(aliasesStr)}\` - ${escapeHtml(commands[key].description)}\n`;
+      helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(aliasesStr)}\` - ${escapeHtml(commands[key].description)}  \n`;
     }
     helpAvailableCmds += "\n";
     helpAvailableCmds += "New commands are actively being developed!";

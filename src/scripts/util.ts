@@ -42,7 +42,7 @@ export const markdownFiles = {
 
 export abstract class Dictionary<T>  {
   protected abstract map: { [index: string]: T };
-  get = (key: string) => this.hasOwnProperty(key)
+  get = (key: string) => this.map.hasOwnProperty(key)
       ? this.map[key]
       : undefined;
   getAll = () => this.map;
