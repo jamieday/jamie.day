@@ -258,11 +258,16 @@ h1 {
   overflow: hidden;
   width: 100px;
   height: 100px;
-  border: 2px solid white;
+  border: 1.2px solid slategray;
   transition: transform 1s;
+  
+  box-shadow: 0px 0px 30px 1px rgba(0,0,0,1);
 }
 .icon-circular img {
-  max-width: 100%;
+  max-width: 150%;
+  position: absolute;
+  top: -21%;
+  left: -23%;
 }
 
 /**
