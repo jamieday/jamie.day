@@ -46,6 +46,11 @@ app.get('/', (_, res) => {
   res.render('pages/index');
 });
 
+// Tetris Game
+app.get('/tetris', (_, res) => {
+  res.sendFile('/tetris/index.html');
+});
+
 async function executeCommand(cmd: string) {
   return <Promise<{stdout: string, stderr: string}>> new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
