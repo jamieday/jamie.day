@@ -172,11 +172,11 @@ const handleJmConsole = () => {
         }
       },
       "resume": {
-        description: "open my resume",
+        description: "request my resume",
         run: () => {
-          window.open('/resume.pdf', '_blank');
+          window.open('mailto:jamie@jamieday.ca?subject=Open%20for%20opportunities%3F&body=Hi%20Jamie%2C%0D%0A%0D%0A...');
         },
-        aliases: ["cv", "doxx"]
+        aliases: ["cv" ]
       },
       "tech-info": {
         description: "read how jamieday.ca works",
