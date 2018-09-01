@@ -212,6 +212,12 @@ const handleJmConsole = () => {
           }
         }
       },
+      "tetris": {
+        description: "open my tetris game in a new tab",
+        run: () => {
+          window.open('/tetris', '_blank');
+        }
+      },
       "changebg": {
         description: "change the background",
         run: () => {
