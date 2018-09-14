@@ -174,7 +174,7 @@ const handleJmConsole = () => {
       "resume": {
         description: "request my resume",
         run: () => {
-          window.open('mailto:jamie@jamieday.ca?subject=Open%20for%20opportunities%3F&body=Hi%20Jamie%2C%0D%0A%0D%0A...');
+          window.open('mailto:jamie@jamieday.ca?subject=Open%20for%20opportunities%3F&body=Hi%20Jamie%2C%0D%0A%0D%0A...', '_self');
         },
         aliases: ["cv" ]
       },
