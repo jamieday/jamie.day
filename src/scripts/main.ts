@@ -69,8 +69,9 @@ function shuffle<T>(a: T[]) {
 
 // preload images
 const backgroundImages = 
-  ["/images/prism-wallpaper.jpg"] // this one always first
+  ["/images/grass.jpg"] // this one always first
   .concat(shuffle([
+    "/images/prism-wallpaper.jpg",
     "/images/bluebox-wallpaper.jpg",
     "/images/lightblue-wallpaper.jpg",
     "/images/green-wallpaper.jpg"

@@ -248,7 +248,7 @@ h1 {
     }
 }
 @keyframes translucinate {
-    to { background-color: rgba(33, 33, 33, 0.75) }
+    to { background-color: rgba(33, 80, 33, 0.50) }
 }
 .icon-circular {
   display: block;
@@ -256,18 +256,17 @@ h1 {
   background: #ccc;
   border-radius: 50%;
   overflow: hidden;
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border: 1.2px solid slategray;
   transition: transform 1s;
   
   box-shadow: 0px 0px 30px 1px rgba(0,0,0,1);
 }
 .icon-circular img {
-  max-width: 150%;
-  position: absolute;
-  top: -21%;
-  left: -23%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 /**
