@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;   
+}
+
+.nav a {
+    color: #5a5a5a;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 140px 10px;
+    text-transform: uppercase;
+    margin-top: 20px;
+}
+
+.nav li {
+    display: inline;
+}
+
+.jumbotron {
+    background-image: url('http://jamieday.ca/archive/2014-2015/universe.jpg');
+    height: 500px;
+    background-repeat: no-repeat;
+    background-size: cover;
+	margin-bottom: 0px;
+}
+
+.jumbotron h1 {
+    color: #d0d0d0;
+	font-size: 48px;
+}
+
+.jumbotron p {
+    color: #a0a0a0;
+}
+
+.about-me {
+    border-top: 2px solid #dbdbdb;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+.learn-more {
+	padding-bottom: 14px;
+}
