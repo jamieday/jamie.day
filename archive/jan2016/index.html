@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>Exceptional</title>
+<link rel='stylesheet' type='text/css' href='main-style.css'>
+<link id='dynamic-style' rel='stylesheet' type='text/css' href='style1.css'>
+</head>
+<script type='text/javascript' src='bug-min.js'></script>
+<script type='text/javascript'>
+	// get some bugs in there
+	var bugs = new BugController({
+	'minDelay': 10000,
+	'maxDelay': 30000,
+	'mouseOver': 'multiply'
+	});
+
+	// don't view this site in australia
+	var spiders = new SpiderController({
+	'minDelay': 20000,
+	'maxDelay': 40000,
+	'mouseOver': 'multiply'
+	});
+	
+	var showRevive = false;
+	var killThread;
+	
+	function killAllBugs() {
+		if (killThread) clearTimeout(killThread);
+		bugs.killAll();
+		spiders.killAll();
+		document.getElementById('revivelink').style.visibility = 'visible';
+		killThread = setTimeout(function() {
+			bugs.end();
+			spiders.end();
+		}, 1000);
+	}
+	
+	function revive() {
+		clearTimeout(killThread);
+		var newOptions =  { 'minDelay': 100, 'maxDelay': 1000, 'mouseOver': 'multiply' };
+		bugs.initialize(newOptions);
+		spiders.initialize(newOptions);
+		document.getElementById('revivelink').style.visibility = 'hidden';
+	}
+</script>
+<body>
+<div id="faderino"></div>
+<div class="background">
+<div class="body-container">
+<div class="header-main">
+<h3>Jamie Day - 2D Personal Website</h3>
+</div>
+<div class="content">
+<p>For previous website, follow this link: <a href="/archive/2014-2015">/archive/2014-2015</a></p>
+<p>This website used to look flashier, more modern and cooler. But then I decided to delete it and start all over again. Trying out different styles.</p>
+<p>Current Project: Save the world, use programs to do it</p>
+<p>Current progress: learning Objective-C, Swift, Unity3D, NodeJS, ReactJS, Cocos2d, Maya, Rails, also, I'm gonna make random graphics fly around on this website (edit: DONE)</p>
+<h4>Links</h4>
+<p><a href="https://bitbucket.org/jday370/">Bitbucket profile</a> - contains some old projects<p>
+<p><a href="http://goo.gl/TsO8OI">My Website</a> - recently updated my personal website to include this link, click here to check out this latest update!</p>
+<p><a href="javascript:killAllBugs()">Murder all the innocent harmless insects</a> - a tool designed for the inherently cruel</p>
+<p id="revivelink" style="visibility:hidden"><a href="javascript:revive()">Revive </a> - a tool designed for the inherently cruel yet remorseful</p>
+<span style="position: fixed;margin:3px;bottom: 10px;font-size: 9px">Il semble que la perfection soit atteinte non quand il n'y a plus rien &agrave; ajouter, mais quand il n'y a plus rien &agrave; retrancher.</span>
+</div>
+</div>
+</div>
+</body>
+<script type='text/javascript'>
+	window.onload = function() {
+	// super ultimate style changing mechanism, Copywrited (c) 2016 by me
+		var styleChangeInterval = 15000; // how long before style changes
+		var fadeInterval = 1250; // time taken to fade, > transition speed to reach full opacity
+		var currentStyle = 1;
+		function updateStyleSheet() {
+		 	document.getElementById('faderino').style.opacity = '1';
+			setTimeout(function() {
+				if (currentStyle++ >= 4) currentStyle = 1;
+				document.getElementById('dynamic-style').href = "style" + currentStyle + ".css";document.getElementById('faderino').style.opacity = '0';
+			}, fadeInterval);
+		}
+		setInterval(updateStyleSheet, styleChangeInterval);
+	}
+</script>
+</html>
