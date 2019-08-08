@@ -1,0 +1,38 @@
+#!/bin/bash
+set -euf -o pipefail
+
+usage() {
+  echo Nothing interesting happened.
+  exit 1
+}
+
+if [ "$#" -ne 1 ]; then
+  usage
+fi
+
+if [[ "$1" = 'deploy' ]]; then
+  current_branch() {
+    echo $(git branch | grep \* | cut -d' ' -f2)
+  }
+  if [[ "$(current_branch)" != 'release' ]]; then
+    echo "Must be on the release branch to release."
+    exit 1
+  fi
+
+  # build for production
+  yarn build
+  
+  # overwrite build files on server
+  readonly SERVER_BUILD_DIR=../Server/build
+  if [ -d "$SERVER_BUILD_DIR" ]; then
+    rm -r "$SERVER_BUILD_DIR"
+  fi
+  mv build "$SERVER_BUILD_DIR"
+  
+  # deploy server
+  pushd ../Server
+    eb deploy
+  popd
+else
+  usage
+fi

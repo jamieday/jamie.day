@@ -1,0 +1,30 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "esnext",
+
+    "removeComments": true,
+    "strict": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    "preserveConstEnums": true,
+    "sourceMap": true
+  },
+  "include": ["**/*"],
+  "exclude": [
+    "node_modules",
+    "src",
+    "public",
+    "backup",
+    "views",
+    "**/*.spec.ts"
+  ]
+}
