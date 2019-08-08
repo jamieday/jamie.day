@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react",
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "allowJs": true
+  },
+  "include": ["**/*"]
+}

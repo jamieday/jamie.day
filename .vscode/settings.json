@@ -1,14 +1,8 @@
 {
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-
-        "**/*.js.map":  {"when": "$(basename).map"},
-        "**/*.js": {"when": "$(basename).ts"},
-        
-        "node_modules": true,
-    }
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": true
+  },
+  "editor.formatOnSave": true
 }

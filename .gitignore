@@ -2,6 +2,7 @@
 public/styles/
 public/scripts/
 **/*.js
+!**/webpack.config.js
 **/*.js.map
 
 # Logs
