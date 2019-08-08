@@ -9,8 +9,7 @@
   "main": "app.js",
   "scripts": {
     "start": "tsc -p .; node app.js",
-    "dev": "./dev-server.sh",
-    "dev-win": "bash -c ./dev-server.sh win"
+    "dev": "./dev-server.sh"
   },
   "dependencies": {
     "@types/express": "^4.11.1",
