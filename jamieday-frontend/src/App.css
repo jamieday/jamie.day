@@ -1,20 +1,28 @@
 .App {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   text-align: center;
+  background-color: #282c34;
 }
 
-.App-logo {
-  animation: App-logo-bounce infinite 600ms ease-out alternate;
-  height: 40vmin;
+.Title {
+  animation: Title-glow infinite 2000ms linear alternate;
+  background: #333944;
+  margin-bottom: 40px;
+  border-radius: 5px;
+  padding: 15px;
   pointer-events: none;
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
+  padding: 30px;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: white;
 }
@@ -23,11 +31,13 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-bounce {
+@keyframes Title-glow {
   from {
-    transform: translateY(0);
+    background: #333944;
+    box-shadow: 0px 0px 1px 0px rgba(255, 255, 255, 0.75);
   }
   100% {
-    transform: translateY(-30%);
+    background: #38455c;
+    box-shadow: 0px 0px 5px 0px rgba(255, 255, 255, 0.75);
   }
 }
