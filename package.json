@@ -3,12 +3,10 @@
   "author": "Jamie Day",
   "version": "2.0.2",
   "description": "Jamie Day Personal Website",
-  "engines": {
-    "node": "^9.11.1"
-  },
   "main": "app.js",
   "scripts": {
-    "start": "tsc -p .; node app.js",
+    "build": "tsc -p .",
+    "start": "node app.js",
     "dev": "./dev-server.sh",
     "dev-win": "bash -c ./dev-server.sh win"
   },
