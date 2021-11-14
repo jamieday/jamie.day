@@ -2,7 +2,7 @@
   --main-bg-color: #242424;
   --material-grey-900: #212121;
   --pre-color: #a9a9a9;
-  --code-color: #ef5350;
+  --code-color: #50bbef;
   --md-color: #dadada;
 }
 
@@ -123,7 +123,7 @@ h1 {
   text-align: left;
   color: #bdbdbd;
   background-color: rgba(33, 33, 33, 1);
-  z-index: 999;
+  border-radius: 20px;
 }
 #jm-console-input {
   width: calc(100% - 15px);

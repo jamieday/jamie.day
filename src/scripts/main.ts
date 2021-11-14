@@ -163,7 +163,8 @@ const handleJmConsole = () => {
         if (instruction.charAt(i) == '`') {
           for (let j = i + 1; j < instruction.length; j++) {
             if (instruction.charAt(j) == '`') {
-              const opening = '<span style="color: #ef5350">';
+              const opening =
+                '<span style="color: #50bbef;padding: 1px 4px;background: #50bbef45;border-radius: 12px;">';
               const closing = '</span>';
               instruction =
                 instruction.substring(0, i) +
@@ -205,9 +206,11 @@ const handleJmConsole = () => {
               aliasesStr = separator;
               aliasesStr += command.aliases.join(separator);
             }
-            helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(
-              aliasesStr,
-            )}\` - ${escapeHtml(commands[key].description)}<br>`;
+            helpAvailableCmds += `<div style="margin-bottom: 5px">\`${escapeHtml(
+              key,
+            )}${escapeHtml(aliasesStr)}\` - ${escapeHtml(
+              commands[key].description,
+            )}</div>`;
           }
           helpAvailableCmds += '<br>New commands are actively being developed!';
           setInstructions(helpAvailableCmds, true);
