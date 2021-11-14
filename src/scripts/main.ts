@@ -26,8 +26,9 @@ function getAbsoluteContainer() {
 
 function jmessage(message: string) {
   const container = J$('.icon-circular');
+  const jmessageClassName = 'jmessage';
   const jmessageElement = document.createElement('span');
-  jmessageElement.className = 'jmessage';
+  jmessageElement.className = jmessageClassName;
   jmessageElement.textContent = message;
   container.appendChild(jmessageElement);
   // not enabled rn bc there are two anims
@@ -127,7 +128,8 @@ class MarkdownFile {
 
 // preload text
 const markdownFiles = {
-  techInfo: new MarkdownFile('/text/tech-info.md'),
+  learnMore: new MarkdownFile('/text/learn-more.md'),
+  philosophy: new MarkdownFile('/text/philosophy.md'),
 };
 
 window.onload = () => {
@@ -188,9 +190,21 @@ const handleJmConsole = () => {
 
   interface Command {
     description: string;
+    commentary?: string;
     run: () => void;
     aliases?: string[];
   }
+
+  const runReaderCommand = async (doc: MarkdownFile) => {
+    const contentElement = document.createElement('div');
+    contentElement.className = 'markdown-content';
+    contentElement.innerHTML = markdownConverter.makeHtml(await doc.content);
+
+    replaceContent(contentElement);
+    contentElement.style.opacity = '1';
+
+    resetConsole();
+  };
 
   const processCmdLoggedIn = (cmd: string) => {
     const commands: { [index: string]: Command } = {
@@ -225,21 +239,14 @@ const handleJmConsole = () => {
           );
         },
       },
-      'tech-info': {
-        description: 'read how jamieday.ca works',
-        run: async () => {
-          const techInfoContent = document.createElement('div');
-          techInfoContent.className = 'markdown-content';
-          techInfoContent.innerHTML = markdownConverter.makeHtml(
-            await markdownFiles.techInfo.content,
-          );
-
-          replaceContent(techInfoContent);
-          techInfoContent.style.opacity = '1';
-
-          resetConsole();
-        },
+      'learn-more': {
+        description: 'learn more about this website',
+        run: () => runReaderCommand(markdownFiles.learnMore),
       },
+      // philosophy: {
+      //   description: 'read my ramblings',
+      //   run: () => runReaderCommand(markdownFiles.philosophy),
+      // },
       blackboard: {
         description: 'toggle the online blackboard',
         run: () => {
@@ -335,6 +342,9 @@ const handleJmConsole = () => {
 
     if (typeof commandResult === 'object') {
       commandResult.run();
+      if (commandResult.commentary) {
+        jmessage(commandResult.commentary);
+      }
       return true;
     } else {
       const cmdEscaped = escapeHtml(cmd);
