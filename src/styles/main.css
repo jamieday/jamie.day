@@ -16,7 +16,7 @@ body {
   display: flex;
   flex-direction: column;
 
-  font-family: "Open Sans", "Roboto", Helvetica Neue, Helvetica, Arial,
+  font-family: 'Open Sans', 'Roboto', Helvetica Neue, Helvetica, Arial,
     sans-serif;
   background-color: var(--main-bg-color);
 }
@@ -64,7 +64,7 @@ body::-webkit-scrollbar-thumb {
   left: 0;
   width: 100%;
   height: 100%;
-  content: "";
+  content: '';
   background-color: var(--material-grey-900);
   animation: translucinate 1s ease-in 500ms 1 forwards; /* todo variables for these #s */
 }
@@ -100,7 +100,22 @@ h1 {
   color: #bdbdbd;
 }
 .history-log ul > li {
-  animation: fadeOut 2s ease-in 1s forwards;
+  animation: fadeOut 2s ease-in 5s forwards;
+  font-size: 14px;
+}
+.jmessage {
+  pointer-events: none;
+  position: absolute;
+  top: 26px;
+  left: 169px;
+  white-space: nowrap;
+  padding: 5px;
+  background: #3333;
+  border-radius: 12px;
+  opacity: 0;
+  animation: fwade-in 2s ease 500ms 1 forwards, fadeOut 2s ease-in 7s forwards;
+  font-size: 22px;
+  color: white;
 }
 #jm-console {
   display: inline-block;
@@ -256,7 +271,7 @@ h1 {
   margin: 0px auto 20px auto;
   background: #ccc;
   border-radius: 50%;
-  overflow: hidden;
+  /* overflow: hidden; */
   width: 200px;
   height: 200px;
   border: 1.2px solid slategray;

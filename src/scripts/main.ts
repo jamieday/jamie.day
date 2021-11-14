@@ -6,8 +6,6 @@ import {
   Login,
   FloatingMsg,
   CommandEntered,
-  Connect,
-  Disconnect,
   Logout,
   Init,
 } from './shared/socket-payloads.js';
@@ -15,6 +13,28 @@ import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
 const markdownConverter = new showdown.Converter();
+
+function getAbsoluteContainer() {
+  let container = document.getElementById('absolute-container');
+  if (container === null) {
+    container = document.createElement('div');
+    container.id = 'absolute-container';
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
+function jmessage(message: string) {
+  const container = J$('.icon-circular');
+  const jmessageElement = document.createElement('span');
+  jmessageElement.className = 'jmessage';
+  jmessageElement.textContent = message;
+  container.appendChild(jmessageElement);
+  // not enabled rn bc there are two anims
+  // jmessageElement.addEventListener('animationend', () => {
+  //   slowLogContainer.removeChild(jmessageElement);
+  // });
+}
 
 export class WebSocketInfo {
   public socket: SocketIOClient.Socket;
@@ -61,6 +81,7 @@ ws.socket.on(SocketEvent.Logout, (data: Logout.EventPayload) => {
 let username = null;
 function loginWithUsername(name: string) {
   username = name;
+  jmessage(`Welcome, ${username}.`);
   ws.socket.emit(SocketEvent.Login, new Login.EmitPayload(username));
 }
 function logout() {
@@ -405,16 +426,6 @@ const handleJmConsole = () => {
     // someone entered a command - other things could be done here
   }
 
-  function getAbsoluteContainer() {
-    let container = document.getElementById('absolute-container');
-    if (container === null) {
-      container = document.createElement('div');
-      container.id = 'absolute-container';
-      document.body.appendChild(container);
-    }
-    return container;
-  }
-
   let totalParticles = 0;
 
   setTimeout(() => {
@@ -575,6 +586,7 @@ const handleJmConsole = () => {
       case ConsoleState.Init:
         loginWithUsername(cmd);
         consoleState = ConsoleState.LoggedIn;
+        <HTMLAudioElement>J$('#cool-music').play();
         resetConsole();
         break;
       case ConsoleState.LoggedIn:
