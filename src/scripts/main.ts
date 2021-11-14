@@ -68,15 +68,16 @@ function shuffle<T>(a: T[]) {
 }
 
 // preload images
-const backgroundImages = 
-  ["/images/grass.jpg"] // this one always first
-  .concat(shuffle([
-    "/images/prism-wallpaper.jpg",
-    "/images/bluebox-wallpaper.jpg",
-    "/images/lightblue-wallpaper.jpg",
-    "/images/green-wallpaper.jpg"
-]));
-for (let i=0; i<backgroundImages.length; i++) {
+const backgroundImages = ["/images/lightblue-wallpaper.jpg"] // this one always first
+  .concat(
+    shuffle([
+      "/images/prism-wallpaper.jpg",
+      "/images/bluebox-wallpaper.jpg",
+      "/images/grass.jpg",
+      "/images/green-wallpaper.jpg",
+    ])
+  );
+for (let i = 0; i < backgroundImages.length; i++) {
   let img = new Image();
   img.src = backgroundImages[i];
 }
@@ -172,12 +173,14 @@ const handleJmConsole = () => {
           setInstructions(helpAvailableCmds, true);
         }
       },
-      "resume": {
-        description: "request my resume",
+      contact: {
+        description: "get in touch with me",
         run: () => {
-          window.open('mailto:jamie@jamieday.ca?subject=Open%20for%20opportunities%3F&body=Hi%20Jamie%2C%0D%0A%0D%0A...', '_self');
+          window.open(
+            "mailto:jamie@jamieday.ca?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...",
+            "_self"
+          );
         },
-        aliases: ["cv" ]
       },
       "tech-info": {
         description: "read how jamieday.ca works",

@@ -76,8 +76,9 @@ export default class Blackboard {
       self.ctx.textAlign = "center";
       self.ctx.textBaseline = "top";
 
-      let titleX = self.canvas.width / 2, titleY = 0;
-      self.ctx.fillText("Interactive Online Blackboard", titleX, titleY);
+      let titleX = self.canvas.width / 2,
+        titleY = 0;
+      self.ctx.fillText("Multiplayer Online Blackboard", titleX, titleY);
     }
     function redrawTrashComponent() {
       // self.ctx.drawImage(self.trashImage, 20, 20, 40, 40);
