@@ -1,7 +1,16 @@
 declare const showdown: { Converter: Showdown.ConverterStatic };
 
 import { J$, escapeHtml, log } from './util.js';
-import { SocketEvent, Login, FloatingMsg, CommandEntered, Connect, Disconnect, Logout, Init } from './shared/socket-payloads.js';
+import {
+  SocketEvent,
+  Login,
+  FloatingMsg,
+  CommandEntered,
+  Connect,
+  Disconnect,
+  Logout,
+  Init,
+} from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
 
@@ -10,7 +19,7 @@ const markdownConverter = new showdown.Converter();
 export class WebSocketInfo {
   public socket: SocketIOClient.Socket;
   private _totalOnline: number = 0;
-  
+
   constructor(socket: SocketIOClient.Socket) {
     this.socket = socket;
     this.totalOnline = 0;
@@ -22,10 +31,12 @@ export class WebSocketInfo {
 
   set totalOnline(value) {
     this._totalOnline = value;
-    
-    const countElement = <HTMLElement> J$(".online-count");
-    countElement.style.visibility = "visible";
-    countElement.innerHTML = `${escapeHtml(this._totalOnline.toString())} <span style="color:#BDBDBD">online</span>`;
+
+    const countElement = <HTMLElement>J$('.online-count');
+    countElement.style.visibility = 'visible';
+    countElement.innerHTML = `${escapeHtml(
+      this._totalOnline.toString(),
+    )} <span style="color:#BDBDBD">online</span>`;
   }
   get totalOnline() {
     return this._totalOnline;
@@ -57,25 +68,26 @@ function logout() {
   ws.socket.emit(SocketEvent.Logout, new Logout.EmitPayload());
 }
 
-const getBackgroundImageElement = () => <HTMLElement> document.getElementsByClassName("jm-background-img")[0];
+const getBackgroundImageElement = () =>
+  <HTMLElement>document.getElementsByClassName('jm-background-img')[0];
 
 function shuffle<T>(a: T[]) {
-    for (let i = a.length; i; i--) {
-        let j = Math.floor(Math.random() * i);
-        [a[i - 1], a[j]] = [a[j], a[i - 1]];
-    }
-    return a;
+  for (let i = a.length; i; i--) {
+    let j = Math.floor(Math.random() * i);
+    [a[i - 1], a[j]] = [a[j], a[i - 1]];
+  }
+  return a;
 }
 
 // preload images
-const backgroundImages = ["/images/lightblue-wallpaper.jpg"] // this one always first
+const backgroundImages = ['/images/lightblue-wallpaper.jpg'] // this one always first
   .concat(
     shuffle([
-      "/images/prism-wallpaper.jpg",
-      "/images/bluebox-wallpaper.jpg",
-      "/images/grass.jpg",
-      "/images/green-wallpaper.jpg",
-    ])
+      '/images/prism-wallpaper.jpg',
+      '/images/bluebox-wallpaper.jpg',
+      '/images/grass.jpg',
+      '/images/green-wallpaper.jpg',
+    ]),
   );
 for (let i = 0; i < backgroundImages.length; i++) {
   let img = new Image();
@@ -84,7 +96,7 @@ for (let i = 0; i < backgroundImages.length; i++) {
 
 class MarkdownFile {
   filename: string;
-  content: Promise<string>
+  content: Promise<string>;
 
   constructor(filename: string) {
     this.filename = filename;
@@ -94,9 +106,8 @@ class MarkdownFile {
 
 // preload text
 const markdownFiles = {
-  techInfo: new MarkdownFile("/text/tech-info.md")
+  techInfo: new MarkdownFile('/text/tech-info.md'),
 };
-
 
 window.onload = () => {
   handleBgImages();
@@ -109,30 +120,36 @@ const handleBgImages = () => {
   const bgElement = getBackgroundImageElement();
   let bgIndex = 0;
   changeBg = () => {
-    bgElement.style.backgroundImage = `url('${backgroundImages[bgIndex++ % backgroundImages.length]}')`;
-  }
+    bgElement.style.backgroundImage = `url('${
+      backgroundImages[bgIndex++ % backgroundImages.length]
+    }')`;
+  };
   changeBg();
 };
 
 const handleJmConsole = () => {
-  const consoleElement = <HTMLInputElement> J$("#jm-console-input");
-  const consoleInstructionsElement = J$("#jm-console-instructions");
-  const setInstructions = (instruction: string, skipEscape: boolean = false) => {
+  const consoleElement = <HTMLInputElement>J$('#jm-console-input');
+  const consoleInstructionsElement = J$('#jm-console-instructions');
+  const setInstructions = (
+    instruction: string,
+    skipEscape: boolean = false,
+  ) => {
     if (!skipEscape) {
       instruction = escapeHtml(instruction);
     }
     const toHtml = (instruction: string) => {
       for (let i = 0; i < instruction.length; i++) {
-        if (instruction.charAt(i) == "`") {
-          for (let j = i+1; j < instruction.length; j++) {
-            if (instruction.charAt(j) == "`") {
+        if (instruction.charAt(i) == '`') {
+          for (let j = i + 1; j < instruction.length; j++) {
+            if (instruction.charAt(j) == '`') {
               const opening = '<span style="color: #ef5350">';
               const closing = '</span>';
-              instruction = instruction.substring(0, i)
-                + opening
-                + instruction.substring(i+1, j)
-                + closing
-                + instruction.substring(j+1);
+              instruction =
+                instruction.substring(0, i) +
+                opening +
+                instruction.substring(i + 1, j) +
+                closing +
+                instruction.substring(j + 1);
               i = j + closing.length;
               break;
             }
@@ -144,7 +161,7 @@ const handleJmConsole = () => {
     consoleInstructionsElement.innerHTML = toHtml(instruction);
   };
   const clearConsole = () => {
-    consoleElement.value = "";
+    consoleElement.value = '';
   };
 
   interface Command {
@@ -154,113 +171,117 @@ const handleJmConsole = () => {
   }
 
   const processCmdLoggedIn = (cmd: string) => {
-    const commands: { [index:string] : Command } = {
-      "help": {
-        description: "list all available commands",
+    const commands: { [index: string]: Command } = {
+      help: {
+        description: 'list all available commands',
         run: () => {
-          let helpAvailableCmds = "";
+          let helpAvailableCmds = '';
           for (const key in commands) {
             let command = commands[key];
             let aliasesStr = '';
             if (command.aliases) {
-              const separator = " / ";
+              const separator = ' / ';
               aliasesStr = separator;
               aliasesStr += command.aliases.join(separator);
             }
-            helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(aliasesStr)}\` - ${escapeHtml(commands[key].description)}<br>`;
+            helpAvailableCmds += `\`${escapeHtml(key)}${escapeHtml(
+              aliasesStr,
+            )}\` - ${escapeHtml(commands[key].description)}<br>`;
           }
-          helpAvailableCmds += "<br>New commands are actively being developed!";
+          helpAvailableCmds += '<br>New commands are actively being developed!';
           setInstructions(helpAvailableCmds, true);
-        }
+        },
       },
       contact: {
-        description: "get in touch with me",
+        description: 'get in touch with me',
         run: () => {
           window.open(
-            "mailto:jamie@jamieday.ca?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...",
-            "_self"
+            'mailto:jamie@jamieday.ca?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...',
+            '_self',
           );
         },
       },
-      "tech-info": {
-        description: "read how jamieday.ca works",
+      'tech-info': {
+        description: 'read how jamieday.ca works',
         run: async () => {
           const techInfoContent = document.createElement('div');
           techInfoContent.className = 'markdown-content';
-          techInfoContent.innerHTML = markdownConverter.makeHtml(await markdownFiles.techInfo.content);
-          
+          techInfoContent.innerHTML = markdownConverter.makeHtml(
+            await markdownFiles.techInfo.content,
+          );
+
           replaceContent(techInfoContent);
           techInfoContent.style.opacity = '1';
-          
+
           resetConsole();
-        }
+        },
       },
-      "blackboard": {
-        description: "toggle the online blackboard",
+      blackboard: {
+        description: 'toggle the online blackboard',
         run: () => {
           const containerId = 'blackboard-container';
           const blackboardContainer = document.getElementById(containerId);
-      
+
           if (blackboardContainer !== null) {
             collapseContent();
-            setInstructions("Board of that! Type `help` for more.");
+            setInstructions('Board of that! Type `help` for more.');
           } else {
-            const blackboardContainer = document.createElement("div");
+            const blackboardContainer = document.createElement('div');
             blackboardContainer.id = containerId;
-      
+
             const blackboard = new Blackboard(ws);
             blackboard.attachTo(blackboardContainer);
-      
+
             replaceContent(blackboardContainer);
             resetConsole();
           }
-        }
+        },
       },
-      "tetris": {
-        description: "open my tetris game in a new tab",
+      tetris: {
+        description: 'open my tetris game in a new tab',
         run: () => {
           window.open('/tetris', '_blank');
-        }
+        },
       },
-      "changebg": {
-        description: "change the background",
+      changebg: {
+        description: 'change the background',
         run: () => {
           changeBg();
-          setInstructions("Background changed.");
-        }
+          setInstructions('Background changed.');
+        },
       },
-      "linkedin": {
-        description: "open my linkedin in a new tab",
+      linkedin: {
+        description: 'open my linkedin in a new tab',
         run: () => {
           window.open('https://www.linkedin.com/in/dayjamie/', '_blank');
-        }
+        },
       },
-      "github": {
-        description: "open my github in a new tab",
+      github: {
+        description: 'open my github in a new tab',
         run: () => {
           window.open('https://github.com/jamieday/', '_blank');
-        }
+        },
       },
-      "clear": {
-        description: "clear command history",
+      clear: {
+        description: 'clear command history',
         run: () => {
           commandHistory.clear();
         },
       },
-      "logout": {
-        description: "logout of the console",
+      logout: {
+        description: 'logout of the console',
         run: () => {
           collapseContent();
           logout();
           consoleState = ConsoleState.Init;
           resetConsole();
         },
-        aliases: ["exit"]
-      }
+        aliases: ['exit'],
+      },
     };
     enum CommandError {
       UsedShift,
-      UnrecognizedCommand
+      UnrecognizedCommand,
     }
     function findCommand(cmd: string) {
       if (commands.hasOwnProperty(cmd)) {
@@ -268,9 +289,18 @@ const handleJmConsole = () => {
       }
       for (const key in commands) {
         const command = commands[key];
-        if (cmd == key || (command.aliases && command.aliases.indexOf(cmd) !== -1)) {
+        if (
+          cmd == key ||
+          (command.aliases && command.aliases.indexOf(cmd) !== -1)
+        ) {
           return command;
-        } else if (cmd.toLowerCase() == key.toLowerCase() || (command.aliases && command.aliases.map(s => s.toLowerCase()).indexOf(cmd.toLowerCase()) !== -1)) {
+        } else if (
+          cmd.toLowerCase() == key.toLowerCase() ||
+          (command.aliases &&
+            command.aliases
+              .map((s) => s.toLowerCase())
+              .indexOf(cmd.toLowerCase()) !== -1)
+        ) {
           return CommandError.UsedShift;
         }
       }
@@ -278,16 +308,17 @@ const handleJmConsole = () => {
     }
 
     const commandResult = findCommand(cmd);
-    
-    if (typeof commandResult === "object") {
+
+    if (typeof commandResult === 'object') {
       commandResult.run();
       return true;
     } else {
       const cmdEscaped = escapeHtml(cmd);
-      const errMessage = commandResult === CommandError.UsedShift
-        ? `all lowercase please, this is a shift-unfriendly console..
+      const errMessage =
+        commandResult === CommandError.UsedShift
+          ? `all lowercase please, this is a shift-unfriendly console..
         <br>\`${cmdEscaped}\` -> \`${cmdEscaped.toLowerCase()}\``
-        : `\`${cmdEscaped}\` is not a recognized command 😢
+          : `\`${cmdEscaped}\` is not a recognized command 😢
         <br>If you want a list of available commands, try \`help\``;
       setInstructions(errMessage, true);
       return false;
@@ -300,38 +331,41 @@ const handleJmConsole = () => {
   // Handle commands
   enum ConsoleState {
     Init = 0,
-    LoggedIn = 1
+    LoggedIn = 1,
   }
-  const consoleStates : { [index: number] : { welcomeMsg: string } } = {
+  const consoleStates: { [index: number]: { welcomeMsg: string } } = {
     [ConsoleState.Init]: { welcomeMsg: "Hey! What's your name?" },
-    [ConsoleState.LoggedIn]: { welcomeMsg: "Type `help` for a list of commands." }
-  }
+    [ConsoleState.LoggedIn]: {
+      welcomeMsg: 'Type `help` for a list of commands.',
+    },
+  };
   let consoleState = ConsoleState.Init;
   let resetConsole = () => {
-    setInstructions(consoleStates[consoleState].welcomeMsg);  
-  } // WIP login() etc
+    setInstructions(consoleStates[consoleState].welcomeMsg);
+  }; // WIP login() etc
   resetConsole();
-  
-  const getContentContainerElement = () => <HTMLElement> document.getElementsByClassName("content-container")[0];
+
+  const getContentContainerElement = () =>
+    <HTMLElement>document.getElementsByClassName('content-container')[0];
 
   const initialPadding = getContentContainerElement().style.padding;
 
   function collapseContent() {
     const contentContainer = getContentContainerElement();
-    contentContainer.style.display = "none";
+    contentContainer.style.display = 'none';
     contentContainer.innerHTML = '';
   }
   function replaceContent(element: HTMLElement, autoscroll = true) {
     const contentContainer = getContentContainerElement();
-    contentContainer.style.display = "flex";
+    contentContainer.style.display = 'flex';
     contentContainer.innerHTML = '';
 
     contentContainer.appendChild(element);
 
     if (autoscroll) {
       contentContainer.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
+        behavior: 'smooth',
+        block: 'start',
       });
     }
   }
@@ -346,14 +380,18 @@ const handleJmConsole = () => {
 
   {
     // Logo animations
-    const logoElement = <HTMLElement> document.getElementsByClassName('icon-circular')[0];
-    
+    const logoElement = <HTMLElement>(
+      document.getElementsByClassName('icon-circular')[0]
+    );
+
     // Click animation
     logoElement.addEventListener('click', () => {
       if (logoElement.classList.contains('bounce-in')) {
         logoElement.classList.remove('bounce-in');
       }
-      logoElement.style.animation = `rotateFun${Math.random() > 0.5 ? 'Reverse' : ''} 1s`;
+      logoElement.style.animation = `rotateFun${
+        Math.random() > 0.5 ? 'Reverse' : ''
+      } 1s`;
       setTimeout(() => {
         window.location.replace('/');
       }, 700);
@@ -364,7 +402,7 @@ const handleJmConsole = () => {
     if (local) {
       ws.socket.emit(SocketEvent.CommandEntered, data);
     }
-    // someone entered a command - other things could be done here  
+    // someone entered a command - other things could be done here
   }
 
   function getAbsoluteContainer() {
@@ -381,16 +419,14 @@ const handleJmConsole = () => {
 
   setTimeout(() => {
     // Start with 50 particles
-    for (let i = 0; i < 50; i++) 
-      spawnParticle();
+    for (let i = 0; i < 50; i++) spawnParticle();
 
     const particleLimit = 100;
-    
-    function trySpawnParticles() {
-      setTimeout(trySpawnParticles, Math.random()*750);
 
-      if (totalParticles >= particleLimit)
-        return;
+    function trySpawnParticles() {
+      setTimeout(trySpawnParticles, Math.random() * 750);
+
+      if (totalParticles >= particleLimit) return;
       spawnParticle();
     }
     trySpawnParticles();
@@ -403,17 +439,21 @@ const handleJmConsole = () => {
     particle.className = `particle`;
 
     // initial size to pop out then shrink after
-    const radiusPx = 5+Math.random()*50;
+    const radiusPx = 5 + Math.random() * 50;
     particle.style.width = `${radiusPx}px`;
     particle.style.height = `${radiusPx}px`;
-    
-    particle.style.top = `${Math.random()*100}%`;//payload.position.top;
-    particle.style.left = `${Math.random()*100}%`;//payload.position.left;
-    particle.style.right = `${Math.random()*100}%`;//payload.position.right;
 
-    particle.addEventListener('transitionend', evt => {
-      if ((<TransitionEvent> evt).propertyName === 'opacity' && evt.srcElement && (<HTMLElement> evt.srcElement).style.opacity === '0') {
-        (<HTMLElement> container).removeChild(particle);
+    particle.style.top = `${Math.random() * 100}%`; //payload.position.top;
+    particle.style.left = `${Math.random() * 100}%`; //payload.position.left;
+    particle.style.right = `${Math.random() * 100}%`; //payload.position.right;
+
+    particle.addEventListener('transitionend', (evt) => {
+      if (
+        (<TransitionEvent>evt).propertyName === 'opacity' &&
+        evt.srcElement &&
+        (<HTMLElement>evt.srcElement).style.opacity === '0'
+      ) {
+        (<HTMLElement>container).removeChild(particle);
         totalParticles--;
       }
     });
@@ -426,14 +466,16 @@ const handleJmConsole = () => {
 
     setTimeout(function moveToRandomDestination() {
       // Set into motion with randomness
-      particle.style.transform = `translate(${Math.random() > 0.5 ? '-' : ''}${Math.random()*1000}%, ${Math.random() > 0.5 ? '-' : ''}${Math.random()*1000}%)`;
-      setTimeout(moveToRandomDestination, Math.random()*3500);
+      particle.style.transform = `translate(${Math.random() > 0.5 ? '-' : ''}${
+        Math.random() * 1000
+      }%, ${Math.random() > 0.5 ? '-' : ''}${Math.random() * 1000}%)`;
+      setTimeout(moveToRandomDestination, Math.random() * 3500);
     }, 50);
 
     setTimeout(() => {
       // Fade out eventually
       particle.style.opacity = '0';
-    }, 2000+Math.random()*20000);
+    }, 2000 + Math.random() * 20000);
   }
 
   function addFloatingMessage(payload: FloatingMsg.Payload) {
@@ -445,13 +487,13 @@ const handleJmConsole = () => {
 
     // initial size to pop out then shrink after
     commandIndicator.style.fontSize = '36px';
-    
+
     commandIndicator.style.top = payload.position.top;
     commandIndicator.style.left = payload.position.left;
     commandIndicator.style.right = payload.position.right;
 
-    commandIndicator.addEventListener('animationend', evt => {
-      (<HTMLElement> container).removeChild(commandIndicator);
+    commandIndicator.addEventListener('animationend', (evt) => {
+      (<HTMLElement>container).removeChild(commandIndicator);
     });
     container.appendChild(commandIndicator);
 
@@ -461,12 +503,12 @@ const handleJmConsole = () => {
     }, 50);
   }
 
-  class CommandHistory { 
+  class CommandHistory {
     private static readonly historyStorageKey: string = 'JD_HISTORY_STORAGE';
 
     private readonly storage: Storage;
 
-    private history: string[]; 
+    private history: string[];
     private pointer: number = 0;
 
     constructor(storage: Storage) {
@@ -476,15 +518,20 @@ const handleJmConsole = () => {
     }
 
     private load() {
-      const existingHistoryJson = this.storage.getItem(CommandHistory.historyStorageKey);
+      const existingHistoryJson = this.storage.getItem(
+        CommandHistory.historyStorageKey,
+      );
       if (existingHistoryJson === null) {
         return [];
       }
-      return <string[]> JSON.parse(existingHistoryJson);
+      return <string[]>JSON.parse(existingHistoryJson);
     }
 
     save() {
-      this.storage.setItem(CommandHistory.historyStorageKey, JSON.stringify(this.history));
+      this.storage.setItem(
+        CommandHistory.historyStorageKey,
+        JSON.stringify(this.history),
+      );
     }
 
     get currentEntry() {
@@ -507,22 +554,20 @@ const handleJmConsole = () => {
       if (this.history.length === 0) {
         this.addEntry(currentInput);
       }
-      if (this.pointer > 0)
-        this.pointer--;
+      if (this.pointer > 0) this.pointer--;
       return this.currentEntry;
     }
 
     moveDown(currentInput: string) {
-      if (this.pointer > this.history.length - 1)
-        return currentInput;
-      
+      if (this.pointer > this.history.length - 1) return currentInput;
+
       this.pointer++;
       return this.currentEntry;
     }
   }
 
   const commandHistory = new CommandHistory(localStorage);
-  
+
   const processCmd = async (cmd: string) => {
     clearConsole();
     if (!cmd.trim()) return;
@@ -543,34 +588,39 @@ const handleJmConsole = () => {
   };
 
   // Add key events for handling input
-  consoleElement.onkeypress = e => {
+  consoleElement.onkeypress = (e) => {
     e = e || window.event;
     const keyCode = e.keyCode || e.which;
 
-    if (keyCode == 13) { // press enter
+    if (keyCode == 13) {
+      // press enter
       processCmd(consoleElement.value);
       return false;
     }
   };
 
-  consoleElement.onkeydown = e => {
+  consoleElement.onkeydown = (e) => {
     e = e || window.event;
     const keyCode = e.keyCode || e.which;
 
     if (consoleState == ConsoleState.LoggedIn) {
-      if (keyCode == 38) { // press up arrow
-        consoleElement.value = commandHistory.moveUp(consoleElement.value) || '';
+      if (keyCode == 38) {
+        // press up arrow
+        consoleElement.value =
+          commandHistory.moveUp(consoleElement.value) || '';
         return false;
       }
-      if (keyCode == 40) { // press down arrow
-        consoleElement.value = commandHistory.moveDown(consoleElement.value) || '';
+      if (keyCode == 40) {
+        // press down arrow
+        consoleElement.value =
+          commandHistory.moveDown(consoleElement.value) || '';
         return false;
       }
     }
   };
 
   // Focus console input if console is clicked
-  (<HTMLElement> J$("#jm-console")).onclick = () => {
+  (<HTMLElement>J$('#jm-console')).onclick = () => {
     consoleElement.focus();
   };
 };

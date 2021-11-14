@@ -6,12 +6,12 @@ export function J$(selector: string) {
 
 export function escapeHtml(html: string) {
   const text = document.createTextNode(html);
-  const div = document.createElement("div");
+  const div = document.createElement('div');
   div.appendChild(text);
   return div.innerHTML;
 }
 
-const logListElement = <HTMLUListElement> J$('.history-log ul');
+const logListElement = <HTMLUListElement>J$('.history-log ul');
 export function log(message: string) {
   const li = document.createElement('li');
   li.addEventListener('animationend', () => {
