@@ -299,6 +299,9 @@ h1 {
 }
 
 .markdown-content {
+  letter-spacing: normal;
+  font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+
   opacity: 0;
   transition: opacity 1s ease 300ms;
 
@@ -307,7 +310,13 @@ h1 {
   color: var(--md-color);
 }
 .markdown-content p {
-  font-size: 12px;
+  font-size: 15px;
+}
+.markdown-content h2 {
+  color: #c7daf3;
+}
+.markdown-content h3 {
+  color: #b8cce6;
 }
 .markdown-content pre {
   background-color: var(--material-grey-900);
