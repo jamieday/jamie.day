@@ -599,7 +599,9 @@ const handleJmConsole = () => {
       case ConsoleState.Init:
         loginWithUsername(cmd);
         consoleState = ConsoleState.LoggedIn;
-        (<HTMLAudioElement>J$('#cool-music')).play();
+        const musicElement = <HTMLAudioElement>J$('#cool-music');
+        musicElement.volume = 0.2;
+        musicElement.play();
         resetConsole();
         break;
       case ConsoleState.LoggedIn:
