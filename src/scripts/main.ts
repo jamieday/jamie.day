@@ -240,7 +240,7 @@ const handleJmConsole = () => {
         },
       },
       'learn-more': {
-        description: 'learn more about this website',
+        description: 'learn more about my journey',
         run: () => runReaderCommand(markdownFiles.learnMore),
       },
       // philosophy: {
