@@ -226,7 +226,6 @@ const handleJmConsole = () => {
               commands[key].description,
             )}</div>`;
           }
-          helpAvailableCmds += '<br>New commands are actively being developed!';
           setInstructions(helpAvailableCmds, true);
         },
       },
