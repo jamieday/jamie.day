@@ -232,10 +232,45 @@ const handleJmConsole = () => {
       contact: {
         description: 'get in touch with me',
         run: () => {
-          window.open(
-            'mailto:hello@jamie.day?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...',
-            '_self',
-          );
+          const modalContainer = document.createElement('div');
+          modalContainer.className = 'jm-modal-container';
+          const emale = 'hello@jamie.day';
+          const modalThing = `
+          <div class="jm-modal">
+          <div id="add-sth">
+            You can contact me at <a href="mailto:${emale}?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...">${emale}</a>
+          </div>
+        </div>`;
+          modalContainer.innerHTML = modalThing;
+          document.body.appendChild(modalContainer);
+          // can the ends justify such wretched means? this code. omg
+          const oneSecond = 950;
+          const gracePeriod = 2200;
+          setTimeout(() => {
+            J$('#add-sth').innerHTML +=
+              '<br/><span id="disappear">This message will self-destruct in <span id="when"></span></span>';
+            const myArr = [...Array(5).keys()].reverse().map((i) => `${i + 1}`);
+            const $when = J$('#when');
+            for (const [newText, i] of myArr.map(
+              (val, i) => [val, i] as const,
+            )) {
+              setTimeout(() => {
+                $when.textContent = newText;
+                if (i === myArr.length - 1) {
+                  setTimeout(() => {
+                    J$('.jm-modal').innerHTML +=
+                      '<img style="position: absolute;" src="/images/explosion.gif" width="350" height="350" />';
+                    setTimeout(() => {
+                      modalContainer.style.transition = 'opacity 800ms ease';
+                      modalContainer.style.opacity = '0';
+                      modalContainer.style.pointerEvents = 'none';
+                      modalContainer.parentElement!.removeChild(modalContainer);
+                    }, 340);
+                  }, oneSecond);
+                }
+              }, oneSecond * i);
+            }
+          }, gracePeriod);
         },
       },
       'learn-more': {
