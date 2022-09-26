@@ -511,9 +511,9 @@ const handleJmConsole = () => {
     // initial size to pop out then shrink after
     commandIndicator.style.fontSize = '36px';
 
-    commandIndicator.style.top = payload.position.top;
-    commandIndicator.style.left = payload.position.left;
-    commandIndicator.style.right = payload.position.right;
+    commandIndicator.style.top = payload.position.top!;
+    commandIndicator.style.left = payload.position.left!;
+    commandIndicator.style.right = payload.position.right!;
 
     commandIndicator.addEventListener('animationend', (evt) => {
       (<HTMLElement>container).removeChild(commandIndicator);

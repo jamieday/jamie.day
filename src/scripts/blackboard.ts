@@ -177,7 +177,7 @@ export default class Blackboard {
 
     function onPointerDown(e: PointerEvent) {
       // deselect any text etc
-      window.getSelection().removeAllRanges();
+      window.getSelection()!.removeAllRanges();
 
       drawing = true;
       clientData.currentPos.x = e.clientX;
