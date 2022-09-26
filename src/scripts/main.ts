@@ -234,7 +234,7 @@ const handleJmConsole = () => {
         description: 'get in touch with me',
         run: () => {
           window.open(
-            'mailto:jamie@jamieday.ca?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...',
+            'mailto:hello@jamie.day?subject=Hello!&body=Hi%20Jamie%2C%0D%0A%0D%0A...',
             '_self',
           );
         },
