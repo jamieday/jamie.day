@@ -66,7 +66,7 @@ async function executePipeline(command: string) {
     if (output.stdout) console.log(output.stdout);
     if (output.stderr) console.error(output.stderr);
   } catch (e) {
-    console.error(e.message);
+    console.error((e as Error).message);
     process.exit(1);
   }
 }
