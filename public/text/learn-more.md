@@ -10,7 +10,7 @@ I've been building websites since I was seven or eight years old. At first, I di
 
 One day at school when recess was about to begin, I caught some of the older kids sneaking into the library. I followed them, only to find them crowding around the library computer excitedly talking about guns and explosions and other forbidden things.
 
-Turns out they were building animations with an application called Macromedia Flash MX. I asked how it worked, and they showed me how to make cool animations. Naturally, after school I then pirated the software and installed it on my mom's computer (sorry Macromedia). And after playing with it myself, I went on to discover something nobody at school had - ActionScript 2 (that's the scripting language for Flash). With my JavaScript experience, it wasn't terribly unfamiliar to me, so I found a way to do something nobody else could - make interactive stories with secret story arcs. Cool!
+Turns out they were building animations with an application called Macromedia Flash MX. I asked how it worked, and they showed me how to make cool animations. Naturally, after school I then pirated the software and installed it on my mom's computer (sorry Macromedia). And after playing with it myself, I went on to discover something nobody at school had - ActionScript 2 (the scripting language for Flash). With my JavaScript experience, ActionScript wasn't terribly unfamiliar to me, so I found a way to do something nobody else could - make interactive stories with secret story arcs. Cool!
 
 ### Java
 
@@ -28,11 +28,11 @@ The one thing I remember most strongly is the dream I had as a kid - that one da
 
 In 2016, my older brother called me as he was developing some software and wanted me to check it out, possibly even work with him as an intern.
 
-It was a web app, which I had little experience with. Working on the project returned me to my roots; back to my old friends HTML & JavaScript. I learned some new skills too - PHP, C#, SQL, design patterns. And as the startup grew, I had to learn even more things, including customer support, product management, UX, a touch of marketing, or even just how to work on a team. Most of all I learned that startups can be kinda crazy.
+It was a web app, which is something I had little experience with. But I decided to jump in, and working on the project brought me back to my roots; back to my old friends HTML & JavaScript. I learned some new skills too - PHP, C#, SQL, design patterns. As the startup grew, I had to learn even more things, including customer support, product management, UX, a touch of marketing, or even just how to work on a team. Most of all I learned that startups can be kinda crazy.
 
-Working for the past six years at ScalePad has been a period of extreme growth for me. Most fundamentally, at ScalePad I discovered a new purpose for my passions. The dream I had as a child morphed as I matured, and I no longer cared to one day create whatever I wanted. Instead, I aspired to create what _the customer_ wanted - a much more fulfilling (and challenging) mission to be sure.
+In this time I created a number of side-projects, including this website, a tetris game made in F#, two music sharing apps, a hospital management system, a homemade food marketplace, and a special cryptocurrency that now has thousands of owners.
 
-ScalePad has grown over the years into a disruptive force in the IT service industry. But we're still in just the first few steps in this journey! There's always more trouble to brew.
+Building side-projects, going to conferences, and working on challenging problems has made the past six years at ScalePad a period of extreme growth for me. Most fundamentally, at ScalePad I discovered a new purpose for my passions. The dream I had as a child morphed as I matured, and I no longer cared to one day create whatever I wanted. Instead, I aspired to create what _the customer_ wanted - a much more fulfilling (and challenging) mission to be sure.
 
 ### Get in touch
 
