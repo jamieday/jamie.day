@@ -111,9 +111,11 @@ const backgroundImages = ['/images/lightblue-wallpaper.jpg'] // this one always 
       '/images/green-wallpaper.jpg',
     ]),
   );
-for (let i = 0; i < backgroundImages.length; i++) {
+
+const imagesToPreload = [...backgroundImages, '/images/explosion.gif'];
+for (const imageUrl of imagesToPreload) {
   let img = new Image();
-  img.src = backgroundImages[i];
+  img.src = imageUrl;
 }
 
 class MarkdownFile {
