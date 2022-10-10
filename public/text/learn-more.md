@@ -20,19 +20,19 @@ I remember in seventh grade that I was envious of kids who had iPhones and could
 
 I made an RPG game that had auto-walking, but I struggled with the trigonometry because I hadn't learned any of that yet in school. I made a snake game that had a built-in AI which could make an incredibly long snake if you let it go on at 100x speed. And I made a chatbot that would certainly not pass the turing test, but nonetheless had some funny things to say.
 
-I was in awe at what one could do with some basic math & logic. And networking! Creating connected, multiplayer online experiences was like magic. But with minimal funds to pay for a VPS, I couldn't build much of that. I remember my dad's skeptical look as I pleaded with him to give me access to the router so I could forward a few ports.
+I was in awe at what one could do with some basic math & logic.
 
-The one thing I remember most strongly is the dream I had as a kid - that one day I would master the art of programming and be able to create anything I could imagine.
+Above all, what I remember most strongly is the dream I had - that one day I would master the art of programming and be able to create anything I could imagine.
 
 ### Web Apps
 
-In 2016, my older brother called me as he was developing some software and wanted me to check it out, possibly even work with him as an intern.
+In 2016, my older brother called me as he was developing some software and wanted me to check it out, possibly even work with him.
 
-It was a web app, which is something I had little experience with. But I decided to jump in, and working on the project brought me back to my roots; back to my old friends HTML & JavaScript. I learned some new skills too - PHP, C#, SQL, design patterns. As the startup grew, I had to learn even more things, including customer support, product management, UX, a touch of marketing, or even just how to work on a team. Most of all I learned that startups can be kinda crazy.
+It was a B2B web app - not something I had experience with. But I decided to jump in, and working on the project brought me back to my roots; back to my old friends HTML & JavaScript. I learned some new skills too - PHP, C#, SQL, design patterns. As the startup grew, I had to learn even more things, including customer support, product management, UX, even some marketing.
 
-In this time I created a number of side-projects, including this website, a tetris game made in F#, two music sharing apps, a hospital management system, a homemade food marketplace, and a special cryptocurrency that now has thousands of owners.
+In this time I built a few side-projects, including a tetris game made in F# to learn FP, a couple music sharing apps, a hospital management system, a homemade food marketplace, and a special cryptocurrency that now has thousands of owners.
 
-Building side-projects, going to conferences, and working on challenging problems has made the past six years at ScalePad a period of extreme growth for me. Most fundamentally, at ScalePad I discovered a new purpose for my passions. The dream I had as a child morphed as I matured, and I no longer cared to one day create whatever I wanted. Instead, I aspired to create what _the customer_ wanted - a much more fulfilling (and challenging) mission to be sure.
+Building side-projects, going to conferences, and working on challenging problems has made the past six years at ScalePad a period of extreme growth for me. Most fundamentally, at ScalePad I discovered a new purpose for my passions. I gave up on my dream to create whatever I wanted. Instead, I aspired to create what _the customer_ wanted - a much more fulfilling (and challenging) mission to be sure.
 
 ### Get in touch
 
