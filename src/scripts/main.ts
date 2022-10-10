@@ -636,7 +636,7 @@ const handleJmConsole = () => {
         loginWithUsername(cmd);
         consoleState = ConsoleState.LoggedIn;
         const musicElement = <HTMLAudioElement>J$('#cool-music');
-        musicElement.volume = 0.2;
+        musicElement.volume = 0.038;
         musicElement.play();
         resetConsole();
         break;
