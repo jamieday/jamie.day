@@ -275,10 +275,10 @@ const handleJmConsole = () => {
           }, gracePeriod);
         },
       },
-      'learn-more': {
-        description: 'learn more about my journey',
-        run: () => runReaderCommand(markdownFiles.learnMore),
-      },
+      // 'learn-more': {
+      //   description: 'learn more about my journey',
+      //   run: () => runReaderCommand(markdownFiles.learnMore),
+      // },
       // philosophy: {
       //   description: 'read my ramblings',
       //   run: () => runReaderCommand(markdownFiles.philosophy),
