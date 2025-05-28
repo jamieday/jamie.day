@@ -11,6 +11,7 @@ import {
 } from './shared/socket-payloads.js';
 import Blackboard from './blackboard.js';
 import { Showdown } from './modules/showdown/showdown.js';
+import FluidCursor from './fluid.js';
 
 const markdownConverter = new showdown.Converter();
 
@@ -137,6 +138,9 @@ const markdownFiles = {
 window.onload = () => {
   handleBgImages();
   handleJmConsole();
+
+  // Initialize fluid cursor effect
+  new FluidCursor();
 };
 
 let changeBg: () => void;

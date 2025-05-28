@@ -6,6 +6,17 @@
   --md-color: #dadada;
 }
 
+#fluid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 1;
+}
+
 html,
 body {
   height: 100%;
